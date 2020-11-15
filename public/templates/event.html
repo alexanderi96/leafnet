@@ -1,0 +1,25 @@
+{{template "_navbar.html" .}}
+
+<div>
+	<h1>{{.Event.Titolo}}</h1>
+	<p>
+		<h2>
+
+		{{if eq .Event.Creatore .Utente.IdUtente}}
+			<!--
+				In questo caso il cicerone sta visitando il suo stesso evento, includiamo la possibilità di apportare modifiche, vedere il numero di partecipanti e nel caso eliminarlo
+			-->
+			<form action="/delete/" method="POST">
+			  <input type="hidden" name="id" value="{{.Event.IdEvento}}"/>
+			  <input type="submit" value="Delete this event"class="btn btn-primary" >
+			</form>
+		{{else}}
+			<!--
+				Qui invece un globetrotter sta visitando una pagina altrui, deve avere la possibilità di sottoscrivere o annullare la partecipazione (sempre se la data massima di sottoscrizione non è passata ovviamente)
+				inserire commenti e fare altre varie cose
+			-->
+		{{end}}
+	</p>
+</div>
+
+{{template "_footer.html" .}}
