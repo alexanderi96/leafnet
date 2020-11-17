@@ -7,7 +7,6 @@ import (
 	"time"
 	"sync"
 	"strings"
-	"io/ioutil"
 	"math/rand"
 	"github.com/alexanderi96/leafnet/utils"
 )
@@ -142,7 +141,7 @@ func (h *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) {
 
 func (h *PersonHandler) post(w http.ResponseWriter, r *http.Request) {
 	var person Person
-	err = json.Unmarshal(utils.CheckJsonAndGet(r), &person)
+	err := json.Unmarshal(utils.CheckJsonAndGet(w, r), &person)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

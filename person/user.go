@@ -8,14 +8,16 @@ import (
 	"sync"
 	"strings"
 	"io/ioutil"
+		"github.com/alexanderi96/leafnet/sessions"
+
 )
 
 type User struct {
-	Id string
-	Username string
-	Password string
-	Email string
-	Person Person
+	Id string`json:"id"`
+	Username string`json:"username"`
+	Password string`json:"password"`
+	Email string`json:"email"`
+	Person Person`json:"person"`
 }
 
 type UserHandler struct {
@@ -131,5 +133,25 @@ func (h *UserHandler) post(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	jsonBytes, _ := json.Marshal(user.Id)
+	w.Write(jsonBytes)
+}
+
+func (h *UserHandler) WhoAmI(w http.ResponseWriter, r *http.Request) {
+	h.Lock()
+	user, ok := h.Store[sessions.GetCurrentUserId(r)]
+	h.Unlock()
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	jsonBytes, err := json.Marshal(user)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+
+	w.Header().Add("content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write(jsonBytes)
 }
