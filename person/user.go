@@ -1,5 +1,15 @@
 package person
 
+import (
+	"encoding/json"
+	"net/http"
+	"fmt"
+	"time"
+	"sync"
+	"strings"
+	"io/ioutil"
+)
+
 type User struct {
 	Id string
 	Username string
@@ -15,8 +25,8 @@ type UserHandler struct {
 
 func NewUserHandler() *UserHandler {
 	return &UserHandler{
-		Store: map[string]Person{
-			"stego": Person{
+		Store: map[string]User{
+			"stego": User{
 				Id: "stego",
 				Username: "stego",
 				Password: "ciao",

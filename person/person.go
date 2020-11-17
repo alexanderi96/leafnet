@@ -9,12 +9,14 @@ import (
 	"strings"
 	"io/ioutil"
 	"math/rand"
+	"github.com/alexanderi96/leafnet/utils"
 )
 
 type Tree struct {	
-	If string`json:"id"`
-	Father Person`json:"father"`
-	Mother Person`json:"mother"`
+	Id string`json:"id"`
+	Father *Person`json:"father"`
+	Mother *Person`json:"mother"`
+}
 
 type Person struct {
 	Id 			string`json:"id"`
@@ -139,22 +141,8 @@ func (h *PersonHandler) GetPerson(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PersonHandler) post(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	ct := r.Header.Get("content-type")
-	if ct != "application/json" {
-		w.WriteHeader(http.StatusUnsupportedMediaType)
-		w.Write([]byte(fmt.Sprintf("need content-type 'application/json', but got '%s'", ct)))
-	}
-
 	var person Person
-	err = json.Unmarshal(bodyBytes, &person)
+	err = json.Unmarshal(utils.CheckJsonAndGet(r), &person)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
