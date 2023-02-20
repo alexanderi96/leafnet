@@ -1,0 +1,53 @@
+{{template "_navbar.html" .}}
+
+    <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">UUID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Surname</th>
+              <th scope="col">Birthday</th>
+              <th scope="col">Parent1</th>
+              <th scope="col">Parent2</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Persons}}
+            <tr>
+              <td class="uuid">{{.UUID}}</td>  
+              <td>{{.FirstName}}</td>
+              <td>{{.LastName}}</td>
+              <td>{{ .BirthDate }}</td>
+              <td class="uuid">{{.Parent1}}</td>
+              <td class="uuid">{{.Parent2}}</td>
+              <td class="row">
+                <div class="col">
+                  <form action="/manageperson" method="GET">
+                    <input type="hidden" name="uuid" value="{{ .UUID }}">
+                    <input type="submit" value="Modifica">
+                  </form>
+                </div>
+                <div class="col">
+                  <form action="/delete" method="GET">
+                    <input type="hidden" name="uuid" value="{{ .UUID }}">
+                    <input type="submit" value="Elimina">
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+    <button onclick="window.history.back()">Indietro</button>
+
+  <style>
+    .uuid {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 9ch;
+    }
+  </style>
+
+{{template "_footer.html" .}}

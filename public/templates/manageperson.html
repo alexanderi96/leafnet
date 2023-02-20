@@ -1,0 +1,98 @@
+{{template "_navbar.html" .}}
+
+  <head>
+    <title>Aggiungi Persona</title>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+
+			// Popola la select con le persone già presenti in memoria
+			function populateSelect() {
+				$.get("/getpeople", function(data) {
+					var parent1 = $("#parent1");
+					var parent2 = $("#parent2");
+					parent1.empty();
+					parent2.empty();
+					parent1.append("<option value=''>Seleziona un genitore</option>");
+					parent2.append("<option value=''>Seleziona un genitore</option>");
+					for (var i = 0; i < data.length; i++) {
+						parent1.append("<option value='" + data[i].uuid + "'>" + data[i].first_name + " " + data[i].last_name + "</option>");
+						parent2.append("<option value='" + data[i].uuid + "'>" + data[i].first_name + " " + data[i].last_name + "</option>");
+					}
+					$("#parent1").val("{{.Person.Parent1}}");
+    			$("#parent2").val("{{.Person.Parent2}}");
+				});
+			}
+
+			function populateBDate() {
+				// rendo la data appetibile per il campo
+				let timestamp = {{.Person.BirthDate}} * 1000;
+			  let date = new Date(timestamp);
+			  let formattedDate = date.toISOString().substr(0, 10);
+			  document.getElementById("birth_date").value = formattedDate;
+			}
+
+			function populateDDate() {
+				// rendo la data appetibile per il campo
+				let timestamp = {{.Person.DeathDate}} * 1000;
+			  let date = new Date(timestamp);
+			  let formattedDate = date.toISOString().substr(0, 10);
+			  document.getElementById("death_date").value = formattedDate;
+			}
+
+			function populateBio() {
+			  document.getElementById("bio").value = {{.Person.Bio}};
+			}
+
+			// Evento che viene chiamato al caricamento della pagina
+			$(document).ready(function() {
+				populateSelect();
+				populateBDate();
+				populateDDate();
+				populateBio();
+
+				// Evento che viene chiamato al submit del form
+				$("#addpersonform").submit(function(event) {
+					event.preventDefault();
+
+					var uuid = $("#uuid").val();
+					var first_name = $("#first_name").val();
+					var last_name = $("#last_name").val();
+					var birth_date = new Date($("#birth_date").val()).getTime() / 1000;
+					var death_date = new Date($("#death_date").val()).getTime() / 1000;
+					var parent1 = $("#parent1").val();
+					var parent2 = $("#parent2").val();
+					var bio = $("#bio").val();
+
+					$.post("/manageperson", {uuid: uuid, first_name: first_name, last_name: last_name, birth_date: birth_date, death_date: death_date, parent1: parent1, parent2: parent2, bio: bio}, function(data) {});
+				});
+			});
+
+		</script>
+  </head>
+    <h1>Aggiungi una nuova persona</h1>
+    <form id="addpersonform">
+    	<input type="hidden" id="uuid" name="uuid" value="{{.Person.UUID}}">
+      <label for="first_name">Nome:</label>
+      <input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}" required><br><br>
+      <label for="last_name">Cognome:</label>
+      <input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}" required><br><br>
+      <label for="birth_date">Data di Nascita:</label>
+      <input type="date" id="birth_date" name="birth_date" required><br><br>
+      <label for="death_date">Data di Morte:</label>
+      <input type="date" id="death_date" name="death_date"><br><br>
+      <label for="parent1">Genitore 1:</label>
+      <select id="parent1" name="parent1">
+      </select><br><br>
+      <label for="parent2">Genitore 2:</label>
+      <select id="parent2" name="parent2">
+      </select><br><br>
+      <label for="last_name">Cognome:</label>
+      <textarea id="bio" name="bio">{{.Person.Bio}}</textarea><br><br>
+      <input type="submit" value="Aggiungi persona">
+      <button onclick="window.history.back()">Indietro</button>
+    </form>
+
+{{template "_footer.html" .}}
