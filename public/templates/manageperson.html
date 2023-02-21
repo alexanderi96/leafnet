@@ -1,98 +1,119 @@
 {{template "_navbar.html" .}}
+<div class="container center-block mt-3">
+  <div class="row">
+    <div class="card col-lg">
+    	<div class="card-header bg-transparent" >
+        {{if not .Person.Node.UUID}}
+	      <h1 class="card-title">Add a new person</h1>
+	      {{else}}
+	      <h1 class="card-title">Edit {{.Person.FirstName}} {{.Person.LastName}}</h1>
+	      {{end}}
+	    </div>
+    	<div class="card-body" >
+	      <form id="addpersonform" action="/manageperson" method="POST">
+	      	<input type="hidden" id="uuid" name="uuid" value="{{.Person.Node.UUID}}" class="form-control">
+	      	<div class="row g-2">
+	      		<div class="col-md">
+	    		    <div class="form-floating">
+	    		    	<label for="first_name">First Name:</label>
+	    		  		<input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}" class="form-control" required>
+	    		  	</div>
+	    		  </div>
+	    		  <div class="col-md">
+	  		      <div class="form-floating">
+	  		        <label for="last_name">Last Name:</label>
+	  		  			<input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}" class="form-control" required>
+	    				</div>
+	  		    </div>
+	    		</div>
+	    		<br>
+	    		<div class="row g-2">
+	      		<div class="col-md">
+	    		    <div class="form-floating">
+	    		    	<label for="birth_date">Birth Date:</label>
+	        			<input type="date" id="birth_date" name="birth_date" class="form-control" required>
+	        			<script type="text/javascript">
+	        				setValue("birth_date", timestampToDate({{.Person.BirthDate}}))
+	        			</script>
+	    		  	</div>
+	    		  </div>
+	    		  <div class="col-md">
+	    		  	<div class="col-md form-check">
+	    		  	  <input class="form-check-input" type="checkbox" value="" id="passedCheckbox" onChange="showMe('passedCheckbox', 'death_date_div')" />
+	    		  	  <label class="form-check-label" for="passedCheckbox">Passed</label>
+	    		  	</div>
+	  		      <div id="death_date_div" class="form-floating">
+				        <label for="death_date">Obit:</label>
+				        <input type="date" id="death_date" name="death_date" class="form-control">
+				        <script type="text/javascript">
+	        				setValue("death_date", timestampToDate({{.Person.DeathDate}})
+	        			</script>
+	    				</div>
+	  		    </div>
+	    		</div>
+	    		<br>
+	    		<div class="row g-2">
+	      		<div class="col-md">
+	    		    <div class="form-floating">
+	    		    	<label for="parent1">Parent 1:</label>
+	    		    	{{ if gt (len .Persons) 0 }}
+	    	        <div class="dropdown">
+	    	          <select id = "parent1">
+	    	            {{range $key, $value := .Persons}}
+	    	             <option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
+	    	            {{end}}
+	    	          </select>          
+	    	        </div>
+	    	        {{end}}
+	    		  	</div>
+	    		  </div>
+	    		  <div class="col-md">
+	  		      <div class="form-floating">
+	  		      	<label for="parent2">Parent 2:</label>
+				        {{ if gt (len .Persons) 0 }}
+	    	        <div class="dropdown">
+	    	          <select id = "parent2">
+	    	            {{range $key, $value := .Persons}}
+	    	             <option value = "{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
+	    	            {{end}}
+	    	          </select>           
+	    	        </div>
+	    	        {{end}}
+	    				</div>
+	  		    </div>
+	    		</div>
 
-  <head>
-    <title>Aggiungi Persona</title>
+	        <div class="form-group">
+		        <label for="bio">Bio:</label>
+		        <textarea id="bio" name="bio" class="form-control" rows="5">{{.Person.Bio}}</textarea><br><br>
+	        </div>
+        	<div class="card-footer bg-transparent" >
+            <input type="submit" value="Save" class="btn btn-primary"/>
+    	    </div>
+	        
+	      </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+	function populateSelect() {
+		$("#parent1").val("{{.Person.Parent1}}");
+		$("#parent2").val("{{.Person.Parent2}}");
+	};
 
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script>
+	function showMe(trigger, target) {
+    var chboxs = document.getElementById(trigger).style.display;
+    var vis = "none";
+        if(chboxs=="none"){
+         vis = "block"; }
+        if(chboxs=="block"){
+         vis = "none"; }
+    document.getElementById(target).style.display = vis;
+	};
 
-			// Popola la select con le persone già presenti in memoria
-			function populateSelect() {
-				$.get("/getpeople", function(data) {
-					var parent1 = $("#parent1");
-					var parent2 = $("#parent2");
-					parent1.empty();
-					parent2.empty();
-					parent1.append("<option value=''>Seleziona un genitore</option>");
-					parent2.append("<option value=''>Seleziona un genitore</option>");
-					for (var i = 0; i < data.length; i++) {
-						parent1.append("<option value='" + data[i].uuid + "'>" + data[i].first_name + " " + data[i].last_name + "</option>");
-						parent2.append("<option value='" + data[i].uuid + "'>" + data[i].first_name + " " + data[i].last_name + "</option>");
-					}
-					$("#parent1").val("{{.Person.Parent1}}");
-    			$("#parent2").val("{{.Person.Parent2}}");
-				});
-			}
-
-			function populateBDate() {
-				// rendo la data appetibile per il campo
-				let timestamp = {{.Person.BirthDate}} * 1000;
-			  let date = new Date(timestamp);
-			  let formattedDate = date.toISOString().substr(0, 10);
-			  document.getElementById("birth_date").value = formattedDate;
-			}
-
-			function populateDDate() {
-				// rendo la data appetibile per il campo
-				let timestamp = {{.Person.DeathDate}} * 1000;
-			  let date = new Date(timestamp);
-			  let formattedDate = date.toISOString().substr(0, 10);
-			  document.getElementById("death_date").value = formattedDate;
-			}
-
-			function populateBio() {
-			  document.getElementById("bio").value = {{.Person.Bio}};
-			}
-
-			// Evento che viene chiamato al caricamento della pagina
-			$(document).ready(function() {
-				populateSelect();
-				populateBDate();
-				populateDDate();
-				populateBio();
-
-				// Evento che viene chiamato al submit del form
-				$("#addpersonform").submit(function(event) {
-					event.preventDefault();
-
-					var uuid = $("#uuid").val();
-					var first_name = $("#first_name").val();
-					var last_name = $("#last_name").val();
-					var birth_date = new Date($("#birth_date").val()).getTime() / 1000;
-					var death_date = new Date($("#death_date").val()).getTime() / 1000;
-					var parent1 = $("#parent1").val();
-					var parent2 = $("#parent2").val();
-					var bio = $("#bio").val();
-
-					$.post("/manageperson", {uuid: uuid, first_name: first_name, last_name: last_name, birth_date: birth_date, death_date: death_date, parent1: parent1, parent2: parent2, bio: bio}, function(data) {});
-				});
-			});
-
-		</script>
-  </head>
-    <h1>Aggiungi una nuova persona</h1>
-    <form id="addpersonform">
-    	<input type="hidden" id="uuid" name="uuid" value="{{.Person.UUID}}">
-      <label for="first_name">Nome:</label>
-      <input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}" required><br><br>
-      <label for="last_name">Cognome:</label>
-      <input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}" required><br><br>
-      <label for="birth_date">Data di Nascita:</label>
-      <input type="date" id="birth_date" name="birth_date" required><br><br>
-      <label for="death_date">Data di Morte:</label>
-      <input type="date" id="death_date" name="death_date"><br><br>
-      <label for="parent1">Genitore 1:</label>
-      <select id="parent1" name="parent1">
-      </select><br><br>
-      <label for="parent2">Genitore 2:</label>
-      <select id="parent2" name="parent2">
-      </select><br><br>
-      <label for="last_name">Cognome:</label>
-      <textarea id="bio" name="bio">{{.Person.Bio}}</textarea><br><br>
-      <input type="submit" value="Aggiungi persona">
-      <button onclick="window.history.back()">Indietro</button>
-    </form>
-
+	$(document).ready(function() {
+		populateSelect();
+	});
+</script>
 {{template "_footer.html" .}}

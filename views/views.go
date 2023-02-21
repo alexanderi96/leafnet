@@ -28,42 +28,39 @@ var managePersonTemplate *template.Template
 var c types.Context
 var e error
 
+func prepareContext(w http.ResponseWriter, r *http.Request) {
+	//load user info
+	if c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r)); e != nil {
+		log.Println("Internal server error retriving user info")
+		http.Redirect(	w, r, "/", http.StatusInternalServerError)
+	}
+
+	//load persons
+	c.Persons = db.GetPersons()
+}
+
+func setCookie(w http.ResponseWriter) {
+	c.CSRFToken = token 
+	expiration := time.Now().Add(365 * 24 * time.Hour)
+	cookie := http.Cookie{Name: "csrftoken", Value: token, Expires: expiration}
+	http.SetCookie(w, &cookie)
+}
+
 //TODO: add ability to filter displayed events
 func HomeFunc(w http.ResponseWriter, r *http.Request) {
-	
 	if r.Method == "GET" {
+		prepareContext(w, r)
+		setCookie(w)
 
-		c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r))
-		log.Println(sessions.GetCurrentUser(r))
-
-		if e != nil   {
-			log.Println("Internal server error retriving context")
-			http.Redirect(	w, r, "/", http.StatusInternalServerError)
-		} else {
-			c.CSRFToken = token 
-			expiration := time.Now().Add(365 * 24 * time.Hour)
-			cookie := http.Cookie{Name: "csrftoken", Value: token, Expires: expiration}
-			http.SetCookie(w, &cookie)
-
-			homeTemplate.Execute(w, c)
-		}
+		homeTemplate.Execute(w, c)
 	}
 }
 
-func MyProfile(w http.ResponseWriter, r *http.Request) {
-		
+func MyProfile(w http.ResponseWriter, r *http.Request) {		
 	if r.Method == "GET" {
+		prepareContext(w, r)
+		setCookie(w)
 
-		if c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r)); e != nil {
-			log.Println("Internal server error retriving user info")
-			http.Redirect(	w, r, "/", http.StatusInternalServerError)
-		} else {
-			c.CSRFToken = token 
-			expiration := time.Now().Add(365 * 24 * time.Hour)
-			cookie := http.Cookie{Name: "csrftoken", Value: token, Expires: expiration}
-			http.SetCookie(w, &cookie)
-
-			profileTemplate.Execute(w, c)
-		}
+		profileTemplate.Execute(w, c)
 	}
 }

@@ -18,15 +18,14 @@ type Node struct {
 
 type Person struct {
 	Node
-	
 	FirstName string 		`json:"first_name"`
 	LastName  string 		`json:"last_name"`
-	BirthDate int64 	`json:"birth_date"`
-	DeathDate int64 	`json:"death_date"`
+	BirthDate int64 		`json:"birth_date,omitempty"`
+	DeathDate int64 		`json:"death_date,omitempty"`
 	Parent1   string 		`json:"parent1,omitempty"`
 	Parent2   string 		`json:"parent2,omitempty"`
-	//Events   []Multimedia 	`json:"events,omitempty"`
-	Bio			string		`json:"bio"`
+	//Events   []Multimedia `json:"events,omitempty"`
+	Bio			string		`json:"bio,omitempty"`
 }
 
 type Info struct {

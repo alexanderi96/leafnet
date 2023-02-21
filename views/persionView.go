@@ -1,7 +1,7 @@
 package views
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"log"
 	//"html/template"
 	"net/http"
@@ -10,40 +10,39 @@ import (
 
 	"github.com/alexanderi96/leafnet/types"
 	"github.com/alexanderi96/leafnet/db"
-	"github.com/alexanderi96/leafnet/sessions"
+	//"github.com/alexanderi96/leafnet/sessions"
 )
 
 func AddPerson(w http.ResponseWriter, r *http.Request) {
-	c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r))
+	prepareContext(w, r)
+	setCookie(w)
 
-	if e != nil   {
-		log.Println("Internal server error retriving context")
-		http.Redirect(	w, r, "/", http.StatusInternalServerError)
-	} else if r.Method == "POST" {
+	if r.Method == "POST" {
+		r.ParseForm()
 
-		uuid := r.FormValue("uuid")
-		firstName := r.FormValue("first_name")
-		lastName := r.FormValue("last_name")
+		uuid := r.Form.Get("uuid")
+		firstName := r.Form.Get("first_name")
+		lastName := r.Form.Get("last_name")
 
-		date := r.FormValue("birth_date")
+		date := r.Form.Get("birth_date")
 		birthDate, err := strconv.ParseInt(date, 10, 64)
 		if err != nil {
 		    panic(err)
 		}
 
-		dDate := r.FormValue("death_date")
+		dDate := r.Form.Get("death_date")
 		deathDate, err := strconv.ParseInt(dDate, 10, 64)
 		if err != nil {
 		    panic(err)
 		}
 
-		parent1 := r.FormValue("parent1")
-		parent2 := r.FormValue("parent2")
+		parent1 := r.Form.Get("parent1")
+		parent2 := r.Form.Get("parent2")
 
-		bio := r.FormValue("bio")
+		bio := r.Form.Get("bio")
 
 		p := types.Person{
-			Node: types.Node{UUID: uuid},
+			Node: 			types.Node{UUID: uuid},
 			FirstName:      firstName,
 			LastName:       lastName,
 			BirthDate:      birthDate,
@@ -91,18 +90,13 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewPeople(w http.ResponseWriter, r *http.Request) {
-	c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r))
+	prepareContext(w, r)
+	setCookie(w)
 
-	if e != nil   {
-		log.Println("Internal server error retriving context")
-		http.Redirect(	w, r, "/", http.StatusInternalServerError)
-	}
-
-	c.Persons = db.GetPersons()
 	peopleTemplate.Execute(w, c)
 }
 
-func GetPeople(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(db.GetPersons())
-}
+// func GetPeople(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+//     json.NewEncoder(w).Encode(db.GetPersons())
+// }

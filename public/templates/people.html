@@ -1,53 +1,65 @@
 {{template "_navbar.html" .}}
-
-    <table class="table">
+<div class="container center-block mt-3">
+  <div class="row">
+    <div class="card col-lg">
+      <div class="card-header bg-transparent" >
+        <h1 class="card-title">Persons</h1>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0 bg-white">
           <thead>
             <tr>
-              <th scope="col">UUID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Surname</th>
-              <th scope="col">Birthday</th>
-              <th scope="col">Parent1</th>
-              <th scope="col">Parent2</th>
-              <th scope="col">Actions</th>
+              <th>UUID</th>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>Birthday</th>
+              <th>Death date</th>
+              <th>Parent1</th>
+              <th>Parent2</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {{range .Persons}}
+            {{range $index, $person := .Persons}}
             <tr>
-              <td class="uuid">{{.UUID}}</td>  
-              <td>{{.FirstName}}</td>
-              <td>{{.LastName}}</td>
-              <td>{{ .BirthDate }}</td>
-              <td class="uuid">{{.Parent1}}</td>
-              <td class="uuid">{{.Parent2}}</td>
-              <td class="row">
-                <div class="col">
-                  <form action="/manageperson" method="GET">
-                    <input type="hidden" name="uuid" value="{{ .UUID }}">
-                    <input type="submit" value="Modifica">
-                  </form>
-                </div>
-                <div class="col">
-                  <form action="/delete" method="GET">
-                    <input type="hidden" name="uuid" value="{{ .UUID }}">
-                    <input type="submit" value="Elimina">
-                  </form>
-                </div>
+              <td class="uuid">{{$person.UUID}}</td>  
+              <td>{{$person.FirstName}}</td>
+              <td>{{$person.LastName}}</td>
+              <td>
+                <span id="{{$index}}_birth_date"/>
+                <script type="text/javascript">
+                  setInnerText("{{$index}}_birth_date", "☀"+timestampToDate({{$person.BirthDate}}))
+                </script>
+              </td>
+              <td>
+                <span id="{{$index}}_death_date"/>
+                <script type="text/javascript">
+                  setInnerText("{{$index}}_death_date", "☾"+timestampToDate({{$person.DeathDate}}))
+                </script>
+              </td>
+              <td class="uuid">{{$person.Parent1}}</td>
+              <td class="uuid">{{$person.Parent2}}</td>
+              <td>
+                <form action="/manageperson" method="GET">
+                  <input type="hidden" name="uuid" value="{{$person.UUID}}">
+                  <input type="submit" value="Modifica" class="btn btn-secondary">
+                </form>
               </td>
             </tr>
             {{end}}
           </tbody>
         </table>
-    <button onclick="window.history.back()">Indietro</button>
-
-  <style>
-    .uuid {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 9ch;
-    }
-  </style>
-
+      </div>
+    </div>
+  </div>
+</div>
+    
+<style>
+  .uuid {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 9ch;
+  }
+</style>
 {{template "_footer.html" .}}

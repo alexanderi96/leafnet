@@ -126,19 +126,18 @@ func GetPerson(uuid string) (types.Person, error) {
 	session := newSession()
 	defer session.Close()
 
-	query := fmt.Sprintf(`MATCH (a:Person {uuid: '%s'}) RETURN a.uuid, a.first_name, a.last_name, a.birth_date, a.death_date, a.parent1, a.parent2, a.bio`, uuid)
+	query := fmt.Sprintf(`MATCH (p:Person {uuid: '%s'}) RETURN p.uuid, p.creation_date as creation_date, p.last_update as last_update, p.first_name, p.last_name, p.birth_date, p.death_date, p.parent1, p.parent2, p.bio`, uuid)
 	result, err := session.Run(query, nil)
+
 	if err != nil {
 		return types.Person{}, err
 	}
 
 	if result.Next() {
-		record := result.Record()
-
-		return checkRecordAndGetPerson(record), nil
+		return checkRecordAndGetPerson(result.Record()), nil
+	} else {
+		return types.Person{}, fmt.Errorf("Person not found")
 	}
-
-	return types.Person{}, fmt.Errorf("Person not found")
 }
 
 func GetPersons() []types.Person {
@@ -174,7 +173,7 @@ func DeletePerson(uuid string) (err error) {
 }
 
 func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
-
+	
 	person = types.Person{}
 	
 	uuid := record.GetByIndex(0)

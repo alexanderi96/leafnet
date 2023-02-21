@@ -25,15 +25,15 @@ func main() {
 	//http.HandleFunc("/update-user", views.RequiresLogin(views.UpdateAccountInfo))
 
 
-	http.HandleFunc("/", views.HomeFunc)
+	http.HandleFunc("/", views.RequiresLogin(views.HomeFunc))
 
 	http.HandleFunc("/manageperson", views.RequiresLogin(views.AddPerson))
 	http.HandleFunc("/view", views.RequiresLogin(views.ViewPeople))
 	http.HandleFunc("/delete", views.RequiresLogin(views.DeletePerson))
 
 	// Api
-	http.HandleFunc("/getpeople", views.GetPeople)
+	// http.HandleFunc("/getpeople", views.GetPeople)
 
 	log.Println("Server in ascolto sulla porta 8080")
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8080", nil)
 }
