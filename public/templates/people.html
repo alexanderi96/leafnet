@@ -6,7 +6,7 @@
         <h1 class="card-title">Persons</h1>
       </div>
       <div class="table-responsive">
-        <table class="table align-middle mb-0 bg-white">
+        <table id="peopleTable" class="table align-middle mb-0 bg-white">
           <thead>
             <tr>
               <th>UUID</th>
@@ -53,6 +53,11 @@
     </div>
   </div>
 </div>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#peopleTable').DataTable();
+  });
+</script>
     
 <style>
   .uuid {
