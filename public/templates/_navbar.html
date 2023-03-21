@@ -50,8 +50,8 @@
             </ul>
 
             <div class="d-flex align-items-center">
-              <button type="button" class="btn btn-light" data-mdb-toggle="modal" data-mdb-target="#loginModal">Signin</button>
-              <button type="button" class="btn btn-primary" data-mdb-toggle="modal" data-mdb-target="#signupModal">Signup</button>  
+              <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#loginModal">Signin</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal">Signup</button>  
             </div>
             {{end}}
         </div>
@@ -64,20 +64,20 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Signin</h5>
-            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"/>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
           </div>
           <div class="modal-body">
             <form action="/login" method="POST">
               <div class="form-outline mb-4">
-                <input type="email" name="email" class="form-control" id="email">
                 <label class="form-label" for="email">Email address</label>
+                <input type="email" name="email" class="form-control" id="email">
               </div>
               <div class="form-outline mb-4">
-                <input type="password" name="password" class="form-control" id="passwd">
                 <label class="form-label" for="passwd">Password</label>
+                <input type="password" name="password" class="form-control" id="passwd">
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <input type="submit" value="Signin" class="btn btn-primary" />
               </div>
             </form>
@@ -93,24 +93,24 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Signup</h5>
-            <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"/>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
           </div>
           <div class="modal-body">
             <form action="/signup" method="POST">
               <div class="form-outline mb-4">
-                <input type="text" name="user_name" class="form-control" id="user_name">
                 <label class="form-label" for="user_name">UserName</label>
+                <input type="text" name="user_name" class="form-control" id="user_name">
               </div>
               <div class="form-outline mb-4">
-                <input type="email" name="email" class="form-control" id="email">
                 <label class="form-label" for="email">Email address</label>
+                <input type="email" name="email" class="form-control" id="email">
               </div>
               <div class="form-outline mb-4">
-                <input type="password" name="password" class="form-control" id="passwd">
                 <label class="form-label" for="passwd">Password</label>
+                <input type="password" name="password" class="form-control" id="passwd">
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <input type="submit" value="Signup" class="btn btn-primary" />
               </div>
             </form>

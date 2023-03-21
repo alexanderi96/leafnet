@@ -6,10 +6,11 @@ import (
 	//"html/template"
 	"net/http"
 	"strconv"
+
 	//"time"
 
-	"github.com/alexanderi96/leafnet/types"
 	"github.com/alexanderi96/leafnet/db"
+	"github.com/alexanderi96/leafnet/types"
 	//"github.com/alexanderi96/leafnet/sessions"
 )
 
@@ -20,37 +21,52 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		r.ParseForm()
 
-		uuid := r.Form.Get("uuid")
-		firstName := r.Form.Get("first_name")
-		lastName := r.Form.Get("last_name")
+		p := types.Person{}
 
-		date := r.Form.Get("birth_date")
-		birthDate, err := strconv.ParseInt(date, 10, 64)
-		if err != nil {
-		    panic(err)
+		uuid := r.Form.Get("uuid")
+		p.Node.UUID = uuid
+
+		firstName := r.Form.Get("first_name")
+		p.FirstName = firstName
+
+		lastName := r.Form.Get("last_name")
+		p.LastName = lastName
+
+		if bDate := r.Form.Get("birth_date"); bDate != "" {
+			birthDate, err := strconv.ParseInt(bDate, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			p.BirthDate = birthDate
 		}
 
-		dDate := r.Form.Get("death_date")
-		deathDate, err := strconv.ParseInt(dDate, 10, 64)
-		if err != nil {
-		    panic(err)
+		if dDate := r.Form.Get("death_date"); dDate != "" {
+			deathDate, err := strconv.ParseInt(dDate, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			p.DeathDate = deathDate
 		}
 
 		parent1 := r.Form.Get("parent1")
+		p.Parent1 = parent1
+
 		parent2 := r.Form.Get("parent2")
+		p.Parent2 = parent2
 
 		bio := r.Form.Get("bio")
+		p.Bio = bio
 
-		p := types.Person{
-			Node: 			types.Node{UUID: uuid},
-			FirstName:      firstName,
-			LastName:       lastName,
-			BirthDate:      birthDate,
-			DeathDate:      deathDate,
-			Parent1:        parent1,
-			Parent2:        parent2,
-			Bio:            bio,
-		}
+		// p := types.Person{
+		// 	Node:      types.Node{UUID: uuid},
+		// 	FirstName: firstName,
+		// 	LastName:  lastName,
+		// 	BirthDate: birthDate,
+		// 	DeathDate: deathDate,
+		// 	Parent1:   parent1,
+		// 	Parent2:   parent2,
+		// 	Bio:       bio,
+		// }
 
 		log.Println(("saved person : "), p)
 
@@ -62,7 +78,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "GET" {
 		uuid := r.URL.Query().Get("uuid")
 
-		var err error 
+		var err error
 		c.Person, err = db.GetPerson(uuid)
 		if err != nil {
 			// gestisci il caso in cui non ci sia la persona con l'uuid specificato
@@ -78,7 +94,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		uuid := r.URL.Query().Get("uuid")
-		
+
 		log.Println("person to delete: ", uuid)
 
 		db.DeletePerson(uuid)

@@ -1,5 +1,8 @@
 <script type="text/javascript">
   function timestampToDate(tstamp) {
+    if (!tstamp) {
+      return "";
+    }
     // rendo la data appetibile per il campo
     let timestamp = tstamp * 1000;
     let date = new Date(timestamp);

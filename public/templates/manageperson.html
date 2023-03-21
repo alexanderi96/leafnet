@@ -10,89 +10,75 @@
 	      {{end}}
 	    </div>
     	<div class="card-body" >
-	      <form id="addpersonform" action="/manageperson" method="POST">
+	      <form id="addpersonform">
 	      	<input type="hidden" id="uuid" name="uuid" value="{{.Person.Node.UUID}}" class="form-control">
 	      	<div class="row g-2">
 	      		<div class="col-md">
-	    		    <div class="form-floating">
-	    		    	<label for="first_name">First Name:</label>
-	    		  		<input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}" class="form-control" required>
-	    		  	</div>
+	      			<label class="form-label" for="first_name">First Name</label>
+	    		    <input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}" class="form-control" placeholder="First Name" required>
 	    		  </div>
 	    		  <div class="col-md">
-	  		      <div class="form-floating">
-	  		        <label for="last_name">Last Name:</label>
-	  		  			<input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}" class="form-control" required>
-	    				</div>
+	  		      <label class="form-label" for="last_name">Last Name</label>
+  		  			<input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}" class="form-control" placeholder="Last Name" required>
 	  		    </div>
 	    		</div>
 	    		<br>
 	    		<div class="row g-2">
 	      		<div class="col-md">
-	    		    <div class="form-floating">
-	    		    	<label for="birth_date">Birth Date:</label>
-	        			<input type="date" id="birth_date" name="birth_date" class="form-control" required>
+	    		    <label class="form-label" for="birth_date">Birth Date</label>
+	        			<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder="">
 	        			<script type="text/javascript">
 	        				setValue("birth_date", timestampToDate({{.Person.BirthDate}}))
 	        			</script>
-	    		  	</div>
 	    		  </div>
 	    		  <div class="col-md">
-	    		  	<div class="col-md form-check">
-	    		  	  <input class="form-check-input" type="checkbox" value="" id="passedCheckbox" onChange="showMe('passedCheckbox', 'death_date_div')" />
-	    		  	  <label class="form-check-label" for="passedCheckbox">Passed</label>
+	    		  	<label class="form-label" for="death_date">Death Date</label>
+	    		  	<div class="input-group">
+		    		  	<div class="input-group-text">
+	                <input class="form-check-input" value="" aria-label="Checkbox for following input" type="checkbox" id="enableDeathDate" {{if .Person.DeathDate}}checked{{end}}>
+	              </div>
+	        			<input type="date" id="death_date" name="death_date" class="form-control" placeholder="">
+		            <script type="text/javascript">
+			        		setValue("death_date", timestampToDate({{.Person.DeathDate}}))
+      					</script>
 	    		  	</div>
-	  		      <div id="death_date_div" class="form-floating">
-				        <label for="death_date">Obit:</label>
-				        <input type="date" id="death_date" name="death_date" class="form-control">
-				        <script type="text/javascript">
-	        				setValue("death_date", timestampToDate({{.Person.DeathDate}})
-	        			</script>
-	    				</div>
+	    		  </div>
+	    		</div>
+	    		<br>
+	    		{{ if gt (len .Persons) 0 }}
+	    		<div class="row g-2">
+	      		<div class="col-md">
+    		    	<label class="form-label" for="parent1">Parent 1</label>
+    	        <select class="form-select" aria-label="Parent 1 select" id = "parent1">
+  	            {{range $key, $value := .Persons}}
+  	             <option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
+  	            {{end}}
+  	          </select>
+	    		  </div>
+	    		  <div class="col-md">
+	  		      <label class="form-label" for="parent2">Parent 2</label> 
+    	        <select  class="form-select" aria-label="Parent 2 select" id = "parent2">
+    	          {{range $key, $value := .Persons}}
+    	           <option value = "{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
+    	          {{end}}
+    	        </select>
 	  		    </div>
 	    		</div>
 	    		<br>
+	    		{{end}}
 	    		<div class="row g-2">
-	      		<div class="col-md">
-	    		    <div class="form-floating">
-	    		    	<label for="parent1">Parent 1:</label>
-	    		    	{{ if gt (len .Persons) 0 }}
-	    	        <div class="dropdown">
-	    	          <select id = "parent1">
-	    	            {{range $key, $value := .Persons}}
-	    	             <option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
-	    	            {{end}}
-	    	          </select>          
-	    	        </div>
-	    	        {{end}}
-	    		  	</div>
-	    		  </div>
-	    		  <div class="col-md">
-	  		      <div class="form-floating">
-	  		      	<label for="parent2">Parent 2:</label>
-				        {{ if gt (len .Persons) 0 }}
-	    	        <div class="dropdown">
-	    	          <select id = "parent2">
-	    	            {{range $key, $value := .Persons}}
-	    	             <option value = "{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
-	    	            {{end}}
-	    	          </select>           
-	    	        </div>
-	    	        {{end}}
-	    				</div>
-	  		    </div>
-	    		</div>
-
-	        <div class="form-group">
-		        <label for="bio">Bio:</label>
-		        <textarea id="bio" name="bio" class="form-control" rows="5">{{.Person.Bio}}</textarea><br><br>
-	        </div>
-        	<div class="card-footer bg-transparent" >
-            <input type="submit" value="Save" class="btn btn-primary"/>
-    	    </div>
-	        
-	      </form>
+		    		<div class="col-md">
+			        <label class="form-label" for="bio">Bio</label>
+				      <textarea class="form-control" placeholder="Leave a comment here" id="bio" name="bio" style="height: 150px">{{.Person.Bio}}</textarea>
+		      	</div>
+	      	</div>
       </div>
+	  <div class="card-footer bg-transparent" >
+		<input type="submit" value="Save" class="btn btn-primary"/>
+		<button class="btn btn-secondary" onclick="window.history.back()">Back</button>
+		</div>
+
+	</form>
     </div>
   </div>
 </div>
@@ -102,18 +88,37 @@
 		$("#parent2").val("{{.Person.Parent2}}");
 	};
 
-	function showMe(trigger, target) {
-    var chboxs = document.getElementById(trigger).style.display;
-    var vis = "none";
-        if(chboxs=="none"){
-         vis = "block"; }
-        if(chboxs=="block"){
-         vis = "none"; }
-    document.getElementById(target).style.display = vis;
-	};
-
 	$(document).ready(function() {
 		populateSelect();
+
+		var enableDeathDate = document.getElementById("enableDeathDate");
+		var deathDate = document.getElementById("death_date");
+
+		// Enable/disable death date based on checkbox state
+		enableDeathDate.addEventListener("change", function() {
+			deathDate.disabled = !enableDeathDate.checked;
+		});
+
+		// Disable death date if checkbox is not checked on page load
+		if (!enableDeathDate.checked) {
+			deathDate.disabled = true;
+		}
+
+		// Evento che viene chiamato al submit del form
+		$("#addpersonform").submit(function(event) {
+			event.preventDefault();
+
+			var uuid = $("#uuid").val();
+			var first_name = $("#first_name").val();
+			var last_name = $("#last_name").val();
+			var birth_date = $("#birth_date").val() ? new Date($("#birth_date").val()).getTime() / 1000 : "";
+			var death_date = $("#death_date").val() ? new Date($("#death_date").val()).getTime() / 1000 : "";
+			var parent1 = $("#parent1").val();
+			var parent2 = $("#parent2").val();
+			var bio = $("#bio").val();
+
+			$.post("/manageperson", {uuid: uuid, first_name: first_name, last_name: last_name, birth_date: birth_date, death_date: death_date, parent1: parent1, parent2: parent2, bio: bio}, function(data) {});
+		});
 	});
 </script>
 {{template "_footer.html" .}}
