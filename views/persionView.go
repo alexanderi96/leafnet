@@ -57,17 +57,6 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		bio := r.Form.Get("bio")
 		p.Bio = bio
 
-		// p := types.Person{
-		// 	Node:      types.Node{UUID: uuid},
-		// 	FirstName: firstName,
-		// 	LastName:  lastName,
-		// 	BirthDate: birthDate,
-		// 	DeathDate: deathDate,
-		// 	Parent1:   parent1,
-		// 	Parent2:   parent2,
-		// 	Bio:       bio,
-		// }
-
 		log.Println(("saved person : "), p)
 
 		// Salva i dati nel database o nella memoria

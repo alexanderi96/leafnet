@@ -49,7 +49,7 @@
 	    		<div class="row g-2">
 	      		<div class="col-md">
     		    	<label class="form-label" for="parent1">Parent 1</label>
-    	        <select class="form-select" aria-label="Parent 1 select" id = "parent1">
+    	        <select class="form-select" data-placeholder="Parent 1 select" id = "parent1">
   	            {{range $key, $value := .Persons}}
   	             <option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
   	            {{end}}
@@ -57,10 +57,11 @@
 	    		  </div>
 	    		  <div class="col-md">
 	  		      <label class="form-label" for="parent2">Parent 2</label> 
-    	        <select  class="form-select" aria-label="Parent 2 select" id = "parent2">
+    	        <select  class="form-select" data-placeholder="Parent 2 select" id = "parent2">
     	          {{range $key, $value := .Persons}}
     	           <option value = "{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
     	          {{end}}
+				  <option value="">Select a person...</option>
     	        </select>
 	  		    </div>
 	    		</div>
@@ -86,6 +87,10 @@
 	function populateSelect() {
 		$("#parent1").val("{{.Person.Parent1}}");
 		$("#parent2").val("{{.Person.Parent2}}");
+
+		$( 'select' ).select2( {
+			theme: "bootstrap-5",
+		} );
 	};
 
 	$(document).ready(function() {

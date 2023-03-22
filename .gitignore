@@ -1,0 +1,28 @@
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
+*.so
+
+# Folders
+_obj
+_test
+vendor/
+*.egg-info/
+*.egg
+
+# Files
+leafnet*
+*.exe
+*.bak
+*.orig
+*.swp
+*.tmp
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Go specific
+bin/
+pkg/
+*.log

@@ -45,8 +45,12 @@
                 <span id="{{$index}}_death_date">-</span>
                 {{end}}
               </td>
-              <td class="uuid">{{$person.Parent1}}</td>
-              <td class="uuid">{{$person.Parent2}}</td>
+              <td class="uuid">
+                <a href="/manageperson?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
+              </td>
+              <td class="uuid">
+                <a href="/manageperson?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
+              </td>
               <td>
                 <form action="/manageperson" method="GET">
                   <input type="hidden" name="uuid" value="{{$person.UUID}}">

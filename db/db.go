@@ -1,8 +1,8 @@
 package db
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"github.com/alexanderi96/leafnet/types"
 	"github.com/neo4j/neo4j-go-driver/neo4j"
@@ -15,7 +15,7 @@ func init() {
 	log.Println("Initiating db")
 
 	var err error
-	driver, err = neo4j.NewDriver("bolt://192.168.1.157:7687/leafnet", neo4j.NoAuth(), func(c *neo4j.Config) { c.Encrypted = false })
+	driver, err = neo4j.NewDriver("bolt://192.168.1.157:7687/leafnet/", neo4j.BasicAuth("neo4j", ".M4nD0rl423", ""), func(c *neo4j.Config) { c.Encrypted = false })
 	if err != nil {
 		log.Fatalf("Error creating driver: %v", err)
 	}
@@ -48,7 +48,7 @@ func DeleteRelation(from, relation, to string) (err error) {
 	params := map[string]interface{}{
 		"form":     from,
 		"relation": relation,
-		"to":  		to,
+		"to":       to,
 	}
 
 	_, err = session.Run(query, params)
@@ -90,27 +90,27 @@ func NewPerson(p *types.Person) error {
 		  MERGE (p2)-[:PARENT_OF]->(p)
 		)
 	`)
-	
+
 	params := map[string]interface{}{
-		"uuid":        	p.Node.UUID,
-		"first_name": 	p.FirstName,
-		"last_name":  	p.LastName,
-		"birth_date": 	p.BirthDate,
-		"death_date": 	p.DeathDate,
-		"parent1":   	"" + p.Parent1,
-		"parent2":   	"" + p.Parent2,
-		"bio": 			p.Bio,
+		"uuid":       p.Node.UUID,
+		"first_name": p.FirstName,
+		"last_name":  p.LastName,
+		"birth_date": p.BirthDate,
+		"death_date": p.DeathDate,
+		"parent1":    "" + p.Parent1,
+		"parent2":    "" + p.Parent2,
+		"bio":        p.Bio,
 	}
 
 	log.Println("before execute NewPerson")
-	
+
 	// Esecuzione della query
 	result, err := session.Run(query, params)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	
+
 	// Risultato della query
 	if result.Err() == nil {
 		log.Println(result)
@@ -150,7 +150,7 @@ func GetPersons() []types.Person {
 	}
 
 	persons := []types.Person{}
-	
+
 	for result.Next() {
 		record := result.Record()
 
@@ -173,9 +173,9 @@ func DeletePerson(uuid string) (err error) {
 }
 
 func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
-	
+
 	person = types.Person{}
-	
+
 	uuid := record.GetByIndex(0)
 
 	if uuid != nil {
@@ -195,31 +195,31 @@ func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
 	}
 
 	firstName := record.GetByIndex(3)
-	
+
 	if firstName != nil {
 		person.FirstName = firstName.(string)
 	}
 
 	lastName := record.GetByIndex(4)
-	
+
 	if lastName != nil {
 		person.LastName = lastName.(string)
 	}
 
 	birthDate := record.GetByIndex(5)
-	
+
 	if birthDate != nil {
 		person.BirthDate = birthDate.(int64)
 	}
 
 	deathDate := record.GetByIndex(6)
-	
+
 	if deathDate != nil {
 		person.DeathDate = deathDate.(int64)
 	}
 
 	parent1 := record.GetByIndex(7)
-	
+
 	if parent1 != nil {
 		person.Parent1 = parent1.(string)
 	}
@@ -231,7 +231,7 @@ func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
 	}
 
 	bio := record.GetByIndex(9)
-	
+
 	if bio != nil {
 		person.Bio = bio.(string)
 	}
