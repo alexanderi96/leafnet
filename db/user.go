@@ -25,7 +25,6 @@ func ValidUser(email, password string) bool {
 	if result.Next() {
 		record := result.Record()
 		pwd := record.GetByIndex(0)
-
 		if pwd != nil && pwd.(string) == password {
 			return true
 		}

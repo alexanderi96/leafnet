@@ -11,7 +11,7 @@ import (
 	//"time"
 
 	"github.com/alexanderi96/leafnet/views"
-	// "github.com/alexanderi96/leafnet/types"
+	"github.com/alexanderi96/leafnet/config"
 	// "github.com/alexanderi96/leafnet/db"
 )
 
@@ -34,6 +34,6 @@ func main() {
 	// Api
 	// http.HandleFunc("/getpeople", views.GetPeople)
 
-	log.Println("Server in ascolto sulla porta 8080")
-	http.ListenAndServe(":8080", nil)
+	log.Println("Server in ascolto sulla porta " + config.Config["leafnet_port"])
+	http.ListenAndServe(":" + config.Config["leafnet_port"], nil)
 }

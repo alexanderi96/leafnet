@@ -12,8 +12,6 @@ import (
 var driver neo4j.Driver
 
 func init() {
-
-	log.Println(config.Config)
 	// Connessione al database
 	log.Println("Initiating db")
 
@@ -23,7 +21,6 @@ func init() {
 		log.Fatalf("Error creating driver: %v", err)
 	}
 	//defer driver.Close()
-
 }
 
 func newSession() neo4j.Session {
