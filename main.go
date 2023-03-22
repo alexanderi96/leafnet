@@ -2,7 +2,9 @@ package main
 
 import (
 	// "encoding/json"
+
 	"log"
+
 	//"html/template"
 	"net/http"
 	// "strconv"
@@ -14,16 +16,14 @@ import (
 )
 
 func main() {
-
 	views.PopulateTemplates()
 
 	// login-logout handlers
 	http.HandleFunc("/login", views.LoginFunc)
-	http.HandleFunc("/signup", views.SignUpFunc) 
-	http.HandleFunc("/logout", views.RequiresLogin(views.LogoutFunc)) 
+	http.HandleFunc("/signup", views.SignUpFunc)
+	http.HandleFunc("/logout", views.RequiresLogin(views.LogoutFunc))
 	http.HandleFunc("/delete-user", views.RequiresLogin(views.DeleteMyAccount))
 	//http.HandleFunc("/update-user", views.RequiresLogin(views.UpdateAccountInfo))
-
 
 	http.HandleFunc("/", views.RequiresLogin(views.HomeFunc))
 

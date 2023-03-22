@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/alexanderi96/leafnet/config"
 	"github.com/alexanderi96/leafnet/types"
 	"github.com/neo4j/neo4j-go-driver/neo4j"
 )
@@ -11,11 +12,13 @@ import (
 var driver neo4j.Driver
 
 func init() {
+
+	log.Println(config.Config)
 	// Connessione al database
 	log.Println("Initiating db")
 
 	var err error
-	driver, err = neo4j.NewDriver("bolt://192.168.1.157:7687/leafnet/", neo4j.BasicAuth("neo4j", ".M4nD0rl423", ""), func(c *neo4j.Config) { c.Encrypted = false })
+	driver, err = neo4j.NewDriver("bolt://"+config.Config["neo4j_endpoint"]+":"+config.Config["neo4j_port"]+"/"+config.Config["neo4j_schema"]+"/", neo4j.BasicAuth(config.Config["neo4j_username"], config.Config["neo4j_password"], ""), func(c *neo4j.Config) { c.Encrypted = false })
 	if err != nil {
 		log.Fatalf("Error creating driver: %v", err)
 	}
@@ -38,12 +41,12 @@ func DeleteRelation(from, relation, to string) (err error) {
 	session := newSession()
 	defer session.Close()
 
-	query := fmt.Sprintf(`
+	query := `
 		OPTIONAL MATCH (form:Person {uuid: $form})
 		OPTIONAL MATCH (to:Person {uuid: $to})
 		OPTIONAL MATCH (form)-[r:$relation]->(to)
 		DELETE r
-		`)
+		`
 
 	params := map[string]interface{}{
 		"form":     from,
@@ -53,7 +56,7 @@ func DeleteRelation(from, relation, to string) (err error) {
 
 	_, err = session.Run(query, params)
 	if err != nil {
-		log.Println("Error running query: %s\n", err)
+		log.Println("Error running query: ", err)
 	}
 
 	return
@@ -68,7 +71,7 @@ func NewPerson(p *types.Person) error {
 		p.CreateUUID()
 	}
 
-	query := fmt.Sprintf(`
+	query := `
 		MERGE (p:Person {uuid: $uuid})
 		WITH p
 
@@ -89,7 +92,7 @@ func NewPerson(p *types.Person) error {
 		  MERGE (p2:Person {uuid: $parent2})
 		  MERGE (p2)-[:PARENT_OF]->(p)
 		)
-	`)
+	`
 
 	params := map[string]interface{}{
 		"uuid":       p.Node.UUID,
@@ -136,7 +139,7 @@ func GetPerson(uuid string) (types.Person, error) {
 	if result.Next() {
 		return checkRecordAndGetPerson(result.Record()), nil
 	} else {
-		return types.Person{}, fmt.Errorf("Person not found")
+		return types.Person{}, fmt.Errorf("person not found")
 	}
 }
 
@@ -166,7 +169,7 @@ func DeletePerson(uuid string) (err error) {
 
 	_, err = session.Run(fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid), nil)
 	if err != nil {
-		log.Println("Error running query: %s\n", err)
+		log.Println("Error running query: ", err)
 	}
 
 	return
