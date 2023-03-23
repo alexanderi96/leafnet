@@ -11,7 +11,7 @@
   <!--<script src="../../dist/3d-force-graph.js"></script>-->
 </head>
 
-<body>
+<div>
   <div id="graph"></div>
 
   <script>
@@ -25,7 +25,7 @@
     const NODE_REL_SIZE = 3;
     const Y_POSITION_CONSTANT = 1;
     const graph = ForceGraph3D()
-      .dagMode('td')
+      .dagMode(null)
       .dagLevelDistance(100)
       .backgroundColor('#101020')
       .linkColor(() => 'rgba(255,255,255,0.2)')
@@ -37,16 +37,16 @@
       .nodeOpacity(0.9)
       .linkDirectionalParticles(2)
       .linkDirectionalParticleWidth(0.8)
-      .linkDirectionalParticleSpeed(0.006)
-      .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE))
-      .d3VelocityDecay(0.3);
+      .linkDirectionalParticleSpeed(0.005)
+      // .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE))
+      .d3VelocityDecay(0.5);
 
     // Decrease repel intensity
     graph.d3Force('charge').strength(-15);
     
     graph.d3Force('link')
-      .distance(link => 0)
-      .strength(link => 1);;
+      .distance(link => 0.9)
+      .strength(link => 0.1);
 
 
     function getData(persons) {
@@ -90,5 +90,5 @@
     graph(document.getElementById('graph'))
           .graphData(getData({{.Persons}}));
   </script>
-</body>
+</div>
 {{template "_footer.html" .}}

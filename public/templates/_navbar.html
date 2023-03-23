@@ -7,11 +7,13 @@
       {{template "_cdn.html"}}
 
       {{template "_js.html" .}}
+
+      {{template "_css.html" .}}
       
       <title>Leafnet</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow">
+    <nav class="navbar navbar-expand-sm fixed-top navbar-light bg-light shadow">
       <!-- Container wrapper -->
       <div class="container-fluid">
         <a class="navbar-brand" href="/">Leafnet</a>
@@ -56,65 +58,66 @@
             {{end}}
         </div>
       </div>
+
+      <!-- Modal login -->
+      <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Signin</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+            </div>
+            <div class="modal-body">
+              <form action="/login" method="POST">
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="email">Email address</label>
+                  <input type="email" name="email" class="form-control" id="email">
+                </div>
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="passwd">Password</label>
+                  <input type="password" name="password" class="form-control" id="passwd">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <input type="submit" value="Signin" class="btn btn-primary" />
+                </div>
+              </form>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal signup -->
+      <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Signup</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+            </div>
+            <div class="modal-body">
+              <form action="/signup" method="POST">
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="user_name">UserName</label>
+                  <input type="text" name="user_name" class="form-control" id="user_name">
+                </div>
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="email">Email address</label>
+                  <input type="email" name="email" class="form-control" id="email">
+                </div>
+                <div class="form-outline mb-4">
+                  <label class="form-label" for="passwd">Password</label>
+                  <input type="password" name="password" class="form-control" id="passwd">
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <input type="submit" value="Signup" class="btn btn-primary" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </nav>
-
-    <!-- Modal login -->
-    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Signin</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
-          </div>
-          <div class="modal-body">
-            <form action="/login" method="POST">
-              <div class="form-outline mb-4">
-                <label class="form-label" for="email">Email address</label>
-                <input type="email" name="email" class="form-control" id="email">
-              </div>
-              <div class="form-outline mb-4">
-                <label class="form-label" for="passwd">Password</label>
-                <input type="password" name="password" class="form-control" id="passwd">
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <input type="submit" value="Signin" class="btn btn-primary" />
-              </div>
-            </form>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal signup -->
-    <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Signup</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
-          </div>
-          <div class="modal-body">
-            <form action="/signup" method="POST">
-              <div class="form-outline mb-4">
-                <label class="form-label" for="user_name">UserName</label>
-                <input type="text" name="user_name" class="form-control" id="user_name">
-              </div>
-              <div class="form-outline mb-4">
-                <label class="form-label" for="email">Email address</label>
-                <input type="email" name="email" class="form-control" id="email">
-              </div>
-              <div class="form-outline mb-4">
-                <label class="form-label" for="passwd">Password</label>
-                <input type="password" name="password" class="form-control" id="passwd">
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <input type="submit" value="Signup" class="btn btn-primary" />
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+    <main>
