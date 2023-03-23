@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-//PopulateTemplates is used to parse all templates present in
-//the templates folder
+// PopulateTemplates is used to parse all templates present in
+// the templates folder
 func PopulateTemplates() {
 	var allFiles []string
 	templatesDir := "./public/templates/"
@@ -39,4 +39,5 @@ func PopulateTemplates() {
 	profileTemplate = templates.Lookup("userprofile.html")
 	peopleTemplate = templates.Lookup("people.html")
 	managePersonTemplate = templates.Lookup("manageperson.html")
+	graphTemplate = templates.Lookup("graph.html")
 }

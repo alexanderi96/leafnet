@@ -61,7 +61,10 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 
 		// Salva i dati nel database o nella memoria
 
-		db.NewPerson(&p)
+		err := db.NewPerson(&p)
+		if err != nil {
+			log.Println(err)
+		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else if r.Method == "GET" {

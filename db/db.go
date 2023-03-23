@@ -102,8 +102,6 @@ func NewPerson(p *types.Person) error {
 		"bio":        p.Bio,
 	}
 
-	log.Println("before execute NewPerson")
-
 	// Esecuzione della query
 	result, err := session.Run(query, params)
 	if err != nil {
@@ -113,10 +111,8 @@ func NewPerson(p *types.Person) error {
 
 	// Risultato della query
 	if result.Err() == nil {
-		log.Println(result)
 		return nil
 	} else {
-		log.Println(result.Err())
 		return result.Err()
 	}
 }

@@ -1,0 +1,120 @@
+<div class="card col-lg shadow">
+    <div class="card-header bg-transparent" >
+      <h1 class="card-title">Events</h1>
+    </div>
+    <div class="card-body">
+      <table id="eventsTable" class="table table-striped table-bordered dt-responsive nowrap">
+        <h4>Events passed:</h4>
+        <table id="eventsPassedTable" class="table table-striped table-bordered dt-responsive nowrap">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="eventsPassedTableBody">
+          </tbody>
+        </table>
+      
+        <h4>Events today:</h4>
+        <table id="eventsTodayTable" class="table table-striped table-bordered dt-responsive nowrap">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="eventsTodayTableBody">
+          </tbody>
+        </table>
+      
+        <h4>Events in the future:</h4>
+        <table id="eventsFutureTable" class="table table-striped table-bordered dt-responsive nowrap">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="eventsFutureTableBody">
+          </tbody>
+        </table>
+      </table>
+          <script>
+            function formatDate(event, date, url) {
+              var eventFullDate = new Date(date * 1000);
+              var today = new Date();
+              var yearsPassed = today.getFullYear() - eventFullDate.getFullYear();
+              var eventDate = new Date(today.getFullYear(), eventFullDate.getMonth(), eventFullDate.getDate());
+              var tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+              var diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+              
+              var dateString = eventDate.toLocaleDateString();
+              if (eventDate.toDateString() == today.toDateString()) {
+                dateString = "today";
+              } else if (eventDate > today) {
+                dateString = diffDays + " days to come";
+              } else {
+                dateString = -diffDays + " days ago";
+              }
+              
+              return {
+                event: yearsPassed + " " +event,
+                date: dateString,
+                url: url
+              };
+            }
+
+            function updateTable(table, events) {
+              var rows = "";
+              events.forEach(function(event) {
+                rows += "<tr><td>" + event.event + " " + event.url + "</td><td>" + event.date + "</td></tr>";
+              });
+              table.innerHTML = rows;
+            }
+
+            function orderByField(list, field, ascending = true, secondField = "") {
+                const order = ascending ? 1 : -1;
+                const regex = /\d+/;
+                return list.sort((a, b) => {
+                    if (a[field] === b[field]) {
+                    return a[secondField] > b[secondField] ? order : -order;
+                    }
+                    return parseInt(a[field].match(regex)[0], 10) > parseInt(b[field].match(regex)[0], 10) ? order : -order;
+                });
+            }
+
+            var eventsTable = document.getElementById("eventsTable");
+            var pastEvents = [];
+            var currentEvents = [];
+            var futureEvents = [];
+
+            {{range .Persons}}
+              {{if .BirthDate}}
+                var formattedDate = formatDate("byrthday of", {{.BirthDate}}, '<a href="/manageperson?uuid={{.Node.UUID}}">{{.FirstName}} {{.LastName}}</a>');
+                if (formattedDate.date == "today") {
+                  currentEvents.push(formattedDate);
+                } else if (formattedDate.date.endsWith("come")) {
+                  futureEvents.push(formattedDate);
+                } else {
+                  pastEvents.push(formattedDate);
+                }
+              {{end}}
+              {{if .DeathDate}}
+                var formattedDate = formatDate("death anniversary of", {{.DeathDate}}, '<a href="/manageperson?uuid={{.Node.UUID}}">{{.FirstName}} {{.LastName}}</a>');
+                if (formattedDate.date == "today") {
+                  currentEvents.push(formattedDate);
+                } else if (formattedDate.date.endsWith("come")) {
+                  futureEvents.push(formattedDate);
+                } else {
+                  pastEvents.push(formattedDate);
+                }
+              {{end}}
+            {{end}}
+
+            updateTable(document.getElementById("eventsPassedTable"), orderByField(pastEvents, "date", false, "event"));
+            updateTable(document.getElementById("eventsTodayTable"), orderByField(currentEvents, "date", true, "event"));
+            updateTable(document.getElementById("eventsFutureTable"), orderByField(futureEvents, "date", true, "event"));
+          </script>
+    </div>
+  </div>

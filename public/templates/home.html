@@ -1,20 +1,26 @@
 {{template "_navbar.html" .}}
 <div class="container center-block mt-3">
   <div class="row">
-    <div class="card col-lg">
+    <div class="card col-lg shadow">
       <div class="card-header bg-transparent" >
         <h1 class="card-title">Welcome to Leafnet!</h1>
 	    </div>
     	<div class="card-body" >
         <nav>
           <ul>
-            <li><a href="/">Home</a></li>
             <li><a href="/manageperson">Add Person</a></li>
             <li><a href="/view">View People</a></li>
+            <li><a href="/graph">View Graph</a></li>
           </ul>
         </nav>
       </div>
     </div>
   </div>
+  <br>
+  <div class="row">
+    <!-- new card -->
+    {{template "_eventstable.html" .}}
+  </div>
 </div>
+
 {{template "_footer.html" .}}

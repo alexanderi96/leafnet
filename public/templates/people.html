@@ -1,8 +1,8 @@
 {{template "_navbar.html" .}}
 <div class="container center-block mt-3">
   <div class="row">
-    <div class="card col-lg">
-      <div class="card-header bg-transparent" >
+    <div class="card col-lg shadow">
+      <div class="card-header bg-transparent">
         <h1 class="card-title">Persons</h1>
       </div>
       <div class="card-body table-responsive">
@@ -22,14 +22,14 @@
           <tbody>
             {{range $index, $person := .Persons}}
             <tr>
-              <td class="uuid">{{$person.UUID}}</td>  
+              <td class="uuid">{{$person.UUID}}</td>
               <td>{{$person.FirstName}}</td>
               <td>{{$person.LastName}}</td>
               <td>
                 {{if $person.BirthDate}}
-                <span id="{{$index}}_birth_date"/>
+                <span id="{{$index}}_birth_date" />
                 <script type="text/javascript">
-                  setInnerText("{{$index}}_birth_date", timestampToDate({{$person.BirthDate}}))
+                  setInnerText("{{$index}}_birth_date", timestampToDate({{ $person.BirthDate }}))
                 </script>
                 {{else}}
                 <span id="{{$index}}_birth_date">-</span>
@@ -37,9 +37,9 @@
               </td>
               <td>
                 {{if $person.DeathDate}}
-                <span id="{{$index}}_death_date"/>
+                <span id="{{$index}}_death_date" />
                 <script type="text/javascript">
-                  setInnerText("{{$index}}_death_date", timestampToDate({{$person.DeathDate}}))
+                  setInnerText("{{$index}}_death_date", timestampToDate({{ $person.DeathDate }}))
                 </script>
                 {{else}}
                 <span id="{{$index}}_death_date">-</span>
@@ -62,6 +62,9 @@
           </tbody>
         </table>
       </div>
+      <div class="card-footer bg-transparent">
+        <button class="btn btn-secondary" onclick="window.history.back()">Back</button>
+      </div>
     </div>
   </div>
 </div>
@@ -70,7 +73,7 @@
     $('#peopleTable').DataTable();
   });
 </script>
-    
+
 <style>
   .uuid {
     overflow: hidden;
