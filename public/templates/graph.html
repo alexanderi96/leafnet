@@ -8,13 +8,19 @@
   <script src="//unpkg.com/d3-force-3d"></script>
 
   <script src="//unpkg.com/3d-force-graph"></script>
+
+  <script src="//unpkg.com/three"></script>
+  <!-- <script src="//unpkg.com/three-spritetext"></script> -->
   <!--<script src="../../dist/3d-force-graph.js"></script>-->
 </head>
 
 <div>
   <div id="graph"></div>
 
-  <script>
+  <script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
+  <script type="module">
+     import { CSS2DRenderer, CSS2DObject } from '//unpkg.com/three/examples/jsm/renderers/CSS2DRenderer.js';
+
     // controls
     const controls = { 'DAG Orientation': 'td'};
     const gui = new dat.GUI();
@@ -24,29 +30,31 @@
     // graph config
     const NODE_REL_SIZE = 3;
     const Y_POSITION_CONSTANT = 1;
-    const graph = ForceGraph3D()
+    const graph = ForceGraph3D({
+      extraRenderers: [new CSS2DRenderer()]
+    })
       .dagMode(null)
       .dagLevelDistance(100)
-      .backgroundColor('#101020')
-      .linkColor(() => 'rgba(255,255,255,0.2)')
-      .nodeRelSize(NODE_REL_SIZE)
-      .nodeId('id')
+      // .backgroundColor('#101020')
+      .linkColor(() => 'rgba(255,255,255,0.5)')
+      // .nodeRelSize(NODE_REL_SIZE)
+      // .nodeId('id')
       // .nodeVal('value')
-      .nodeLabel('name')
-      .nodeAutoColorBy('last_name')
+      // .nodeLabel('name')
+      // .nodeAutoColorBy('last_name')
       .nodeOpacity(0.9)
       .linkDirectionalParticles(2)
       .linkDirectionalParticleWidth(0.8)
       .linkDirectionalParticleSpeed(0.005)
-      // .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE))
+      .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE))
       .d3VelocityDecay(0.5);
 
     // Decrease repel intensity
-    graph.d3Force('charge').strength(-15);
+    // graph.d3Force('charge').strength(-15);
     
-    graph.d3Force('link')
-      .distance(link => 0.9)
-      .strength(link => 0.1);
+    // graph.d3Force('link')
+    //   .distance(link => 0.9)
+    //   .strength(link => 0.1);
 
 
     function getData(persons) {
@@ -69,14 +77,14 @@
   persons.forEach((person) => {
     if (person.parent1) {
       links.push({
-        source: person.uuid,
-        target: person.parent1
+        source: person.parent1,
+        target: person.uuid
       });
     }
     if (person.parent2) {
       links.push({
-        source: person.uuid,
-        target: person.parent2
+        source: person.parent2,
+        target: person.uuid
       });
     }
   });
@@ -88,7 +96,17 @@
 }
 
     graph(document.getElementById('graph'))
-          .graphData(getData({{.Persons}}));
+          .graphData(getData({{.Persons}}))
+          .nodeAutoColorBy('last_name')
+          .nodeThreeObject(node => {
+            const nodeEl = document.createElement('div');
+            nodeEl.textContent = node.name;
+            nodeEl.style.color = node.color;
+            nodeEl.className = 'node-label';
+            return new CSS2DObject(nodeEl);
+          })
+          .nodeThreeObjectExtend(true)
+          .onNodeClick(node => document.location.href = "/manageperson?uuid=" + node.id);
   </script>
 </div>
 {{template "_footer.html" .}}

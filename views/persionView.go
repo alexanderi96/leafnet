@@ -5,9 +5,8 @@ import (
 	"log"
 	//"html/template"
 	"net/http"
-	"strconv"
 
-	//"time"
+	"time"
 
 	"github.com/alexanderi96/leafnet/db"
 	"github.com/alexanderi96/leafnet/types"
@@ -33,19 +32,21 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		p.LastName = lastName
 
 		if bDate := r.Form.Get("birth_date"); bDate != "" {
-			birthDate, err := strconv.ParseInt(bDate, 10, 64)
+			// birthDate, err := strconv.ParseInt(bDate, 10, 64)
+			birthDate, err := time.Parse("2006-01-02", bDate)
 			if err != nil {
 				panic(err)
 			}
-			p.BirthDate = birthDate
+			p.BirthDate = birthDate.Unix()
 		}
 
 		if dDate := r.Form.Get("death_date"); dDate != "" {
-			deathDate, err := strconv.ParseInt(dDate, 10, 64)
+			//deathDate, err := strconv.ParseInt(dDate, 10, 64)
+			deathDate, err := time.Parse("2006-01-02", dDate)
 			if err != nil {
 				panic(err)
 			}
-			p.DeathDate = deathDate
+			p.DeathDate = deathDate.Unix()
 		}
 
 		parent1 := r.Form.Get("parent1")
@@ -57,16 +58,13 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		bio := r.Form.Get("bio")
 		p.Bio = bio
 
-		log.Println(("saved person : "), p)
-
-		// Salva i dati nel database o nella memoria
-
-		err := db.NewPerson(&p)
+		// Salva i dati nel database
+		err := db.ManagePerson(&p)
 		if err != nil {
 			log.Println(err)
 		}
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else if r.Method == "GET" {
 		uuid := r.URL.Query().Get("uuid")
 
@@ -77,7 +75,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			c.Person = types.Person{}
 		}
-		log.Println("person to edit: ", c.Person)
+		log.Println("Viewing: ", c.Person.Node.UUID)
 
 		managePersonTemplate.Execute(w, c)
 	}

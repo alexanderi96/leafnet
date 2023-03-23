@@ -45,7 +45,6 @@ func GetUserInfo(email string) (u types.User, e error) {
 	}
 
 	if result.Next() {
-		log.Println(result)
 		return *checkRecordAndGetUser(result.Record()), nil
 	}
 

@@ -59,14 +59,10 @@ func DeleteRelation(from, relation, to string) (err error) {
 	return
 }
 
-// NewPerson crea un nuovo nodo Person su neo4j, o lo aggiorna se gia presente
-func NewPerson(p *types.Person) error {
+// ManagePerson crea un nuovo nodo Person su neo4j, o lo aggiorna se gia presente
+func ManagePerson(p *types.Person) error {
 	session := newSession()
 	defer session.Close()
-
-	if len(p.UUID) == 0 {
-		p.CreateUUID()
-	}
 
 	query := `
 		MERGE (p:Person {uuid: $uuid})
@@ -79,6 +75,14 @@ func NewPerson(p *types.Person) error {
 		DELETE r1, r2
 
 		SET p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio, p.last_update = timestamp()
+	`
+
+	if len(p.UUID) == 0 {
+		p.CreateUUID()
+		query += `, p.creation_date = timestamp()`
+	}
+
+	query += `
 
 		FOREACH (g1 IN CASE WHEN $parent1 <> "" THEN [1] ELSE [] END |
 		  MERGE (p1:Person {uuid: $parent1})
@@ -172,64 +176,44 @@ func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
 
 	person = types.Person{}
 
-	uuid := record.GetByIndex(0)
-
-	if uuid != nil {
-		person.Node.UUID = uuid.(string)
+	if uuid, ok := record.GetByIndex(0).(string); ok {
+		person.Node.UUID = uuid
 	}
 
-	creationDate := record.GetByIndex(1)
-
-	if creationDate != nil {
-		person.Node.CreationDate = creationDate.(int64)
+	if creationDate, ok := record.GetByIndex(1).(int64); ok {
+		person.Node.CreationDate = creationDate
 	}
 
-	lastUpdate := record.GetByIndex(2)
-
-	if lastUpdate != nil {
-		person.Node.LastUpdate = lastUpdate.(int64)
+	if lastUpdate, ok := record.GetByIndex(2).(int64); ok {
+		person.Node.LastUpdate = lastUpdate
 	}
 
-	firstName := record.GetByIndex(3)
-
-	if firstName != nil {
-		person.FirstName = firstName.(string)
+	if firstName, ok := record.GetByIndex(3).(string); ok {
+		person.FirstName = firstName
 	}
 
-	lastName := record.GetByIndex(4)
-
-	if lastName != nil {
-		person.LastName = lastName.(string)
+	if lastName, ok := record.GetByIndex(4).(string); ok {
+		person.LastName = lastName
 	}
 
-	birthDate := record.GetByIndex(5)
-
-	if birthDate != nil {
-		person.BirthDate = birthDate.(int64)
+	if birthDate, ok := record.GetByIndex(5).(int64); ok {
+		person.BirthDate = birthDate
 	}
 
-	deathDate := record.GetByIndex(6)
-
-	if deathDate != nil {
-		person.DeathDate = deathDate.(int64)
+	if deathDate, ok := record.GetByIndex(6).(int64); ok {
+		person.DeathDate = deathDate
 	}
 
-	parent1 := record.GetByIndex(7)
-
-	if parent1 != nil {
-		person.Parent1 = parent1.(string)
+	if parent1, ok := record.GetByIndex(7).(string); ok {
+		person.Parent1 = parent1
 	}
 
-	parent2 := record.GetByIndex(8)
-
-	if parent2 != nil {
-		person.Parent2 = parent2.(string)
+	if parent2, ok := record.GetByIndex(8).(string); ok {
+		person.Parent2 = parent2
 	}
 
-	bio := record.GetByIndex(9)
-
-	if bio != nil {
-		person.Bio = bio.(string)
+	if bio, ok := record.GetByIndex(9).(string); ok {
+		person.Bio = bio
 	}
 
 	return person
