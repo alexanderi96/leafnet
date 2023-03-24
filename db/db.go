@@ -72,12 +72,12 @@ func ManagePerson(p *types.Person) error {
 		OPTIONAL MATCH (p2)-[r2:PARENT_OF]->(p)
 		DELETE r1, r2
 
-		SET p.last_update = timestamp(), p.owner = $owner, p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio
+		SET p.last_update = timestamp(), p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio
 	`
 
 	if len(p.UUID) == 0 {
 		p.CreateUUID()
-		query += `, p.creation_date = timestamp()`
+		query += `, p.creation_date = timestamp(), p.owner = $owner`
 	}
 
 	query += `
