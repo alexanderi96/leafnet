@@ -33,6 +33,29 @@ func ValidUser(email, password string) bool {
 	return false
 }
 
+func GetUserPasswdHash(email string) string {
+	session := newSession()
+	defer session.Close()
+
+	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.password`, email)
+	result, err := session.Run(query, nil)
+
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	if result.Next() {
+		record := result.Record()
+
+		if pwd, ok := record.GetByIndex(0).(string); ok {
+			return pwd
+		}
+	}
+
+	return ""
+}
+
 func GetUserInfo(email string) (u types.User, e error) {
 	session := newSession()
 	defer session.Close()

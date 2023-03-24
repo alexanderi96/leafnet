@@ -2,7 +2,6 @@ package views
 
 import (
 	"html/template"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -13,7 +12,7 @@ import (
 func PopulateTemplates() {
 	var allFiles []string
 	templatesDir := "./public/templates/"
-	files, err := ioutil.ReadDir(templatesDir)
+	files, err := os.ReadDir(templatesDir)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1) // No point in running app if templates aren't read
@@ -36,7 +35,7 @@ func PopulateTemplates() {
 	}
 	homeTemplate = templates.Lookup("home.html")
 	loginTemplate = templates.Lookup("login.html")
-	profileTemplate = templates.Lookup("userprofile.html")
+	userPagetemplate = templates.Lookup("userprofile.html")
 	peopleTemplate = templates.Lookup("people.html")
 	managePersonTemplate = templates.Lookup("manageperson.html")
 	graphTemplate = templates.Lookup("graph.html")

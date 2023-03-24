@@ -15,7 +15,6 @@ import (
 
 func AddPerson(w http.ResponseWriter, r *http.Request) {
 	prepareContext(w, r)
-	setCookie(w)
 
 	if r.Method == "POST" {
 		r.ParseForm()
@@ -97,7 +96,6 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 
 func ViewPeople(w http.ResponseWriter, r *http.Request) {
 	prepareContext(w, r)
-	setCookie(w)
 
 	peopleTemplate.Execute(w, c)
 }

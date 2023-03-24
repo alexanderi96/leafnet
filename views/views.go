@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"time"
 
 	// "strings"
 	// "strconv"
@@ -15,14 +14,14 @@ import (
 	"github.com/alexanderi96/leafnet/types"
 )
 
-const (
-	token = "abcd"
-)
+// const (
+// 	token = "abcd"
+// )
 
 var templates *template.Template
 var homeTemplate *template.Template
 var loginTemplate *template.Template
-var profileTemplate *template.Template
+var userPagetemplate *template.Template
 var peopleTemplate *template.Template
 var managePersonTemplate *template.Template
 var graphTemplate *template.Template
@@ -41,18 +40,47 @@ func prepareContext(w http.ResponseWriter, r *http.Request) {
 	c.Persons = db.GetPersons()
 }
 
-func setCookie(w http.ResponseWriter) {
-	c.CSRFToken = token
-	expiration := time.Now().Add(365 * 24 * time.Hour)
-	cookie := http.Cookie{Name: "csrftoken", Value: token, Expires: expiration}
-	http.SetCookie(w, &cookie)
-}
+// func setCookie(w http.ResponseWriter) {
+// 	c.CSRFToken = token
+
+// 	cookie := http.Cookie{
+// 		Name:     "csrftoken",
+// 		Value:    token,
+// 		Path:     "/",
+// 		MaxAge:   3600,
+// 		HttpOnly: true,
+// 		Secure:   true,
+// 		SameSite: http.SameSiteLaxMode,
+// 	}
+
+// 	log.Println("Setting cookie: ", cookie)
+
+// 	http.SetCookie(w, &cookie)
+// }
+
+// func checkCookie(r *http.Request) bool {
+// 	cookie, err := r.Cookie("csrftoken")
+// 	log.Println("Checking cookie: ", cookie)
+// 	if err != nil {
+// 		log.Println("Error getting cookie: ", err)
+// 		return false
+// 	}
+// 	if cookie.Value != token {
+// 		log.Println("Cookie is not valid")
+// 		return false
+// 	}
+// 	if time.Now().After(cookie.Expires) {
+// 		log.Println("Cookie is expired: ", time.Now(), "Cookie expiration: ", cookie.Expires)
+// 		return false
+// 	}
+
+// 	return true
+// }
 
 // TODO: add ability to filter displayed events
 func HomeFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prepareContext(w, r)
-		setCookie(w)
 
 		homeTemplate.Execute(w, c)
 	}
@@ -61,17 +89,15 @@ func HomeFunc(w http.ResponseWriter, r *http.Request) {
 func GraphFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prepareContext(w, r)
-		setCookie(w)
 
 		graphTemplate.Execute(w, c)
 	}
 }
 
-func MyProfile(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		setCookie(w)
+// func MyProfile(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method == "GET" {
+// 		prepareContext(w, r)
 
-		profileTemplate.Execute(w, c)
-	}
-}
+// 		userPagetemplate.Execute(w, c)
+// 	}
+// }

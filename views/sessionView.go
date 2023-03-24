@@ -1,71 +1,80 @@
 package views
 
-import(
+import (
 	"log"
 	"net/http"
 
-	"github.com/alexanderi96/leafnet/types"
 	"github.com/alexanderi96/leafnet/db"
 	"github.com/alexanderi96/leafnet/sessions"
+	"github.com/alexanderi96/leafnet/types"
+	"github.com/alexanderi96/leafnet/utils"
 )
 
-//RequiresLogin is a middleware which will be used for each httpHandler to check if there is any active session
+// RequiresLogin is a middleware which will be used for each httpHandler to check if there is any active session
 func RequiresLogin(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !sessions.IsLoggedIn(r) {
+		if !sessions.IsLoggedIn(r) { // || !checkCookie)r) {}
 			log.Print("invalid session")
-			http.Redirect(w, r, "/login", 302)
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 		handler(w, r)
 	}
 }
 
-
-//LogoutFunc Implements the logout functionality. WIll delete the session information from the cookie store
+// LogoutFunc Implements the logout functionality. WIll delete the session information from the cookie store
 func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
-	log.Println("Logout function")
 	if err == nil { //If there is no error, then remove session
+		log.Println("removing session for user: ", session.Values["email"])
 		if session.Values["loggedin"] != "false" {
 			session.Values["loggedin"] = "false"
 			session.Save(r, w)
 		}
 	}
-	http.Redirect(w, r, "/login", 302) //redirect to login irrespective of error or not
+
+	loginTemplate.Execute(w, http.StatusFound) //redirect to login irrespective of error or not
 }
 
-//LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
+// LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
 func LoginFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
 
 	if err != nil {
-	    http.Error(w, err.Error(), http.StatusInternalServerError)
-	    return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	switch r.Method {
 	case "GET":
-		log.Print("Inside GET")
+		log.Print("New access to the login page")
 		loginTemplate.Execute(w, nil)
 	case "POST":
-		log.Print("Inside POST")
 		r.ParseForm()
 		email := r.Form.Get("email")
 		password := r.Form.Get("password")
 
-		if (email != "" && password != "") && db.ValidUser(email, password) {
+		log.Print("Attempting to login with email: ", email)
+		if (email != "" && password != "") && utils.CheckStrHash(password, db.GetUserPasswdHash(email)) {
 			session.Values["loggedin"] = "true"
 			session.Values["email"] = email
-			session.Save(r, w)
+			session.Options.MaxAge = 3600 // imposto l'età massima della sessione a 1 ora
+
+			if err := session.Save(r, w); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			// setCookie(w)
 			log.Print("user ", email, " is authenticated")
-			http.Redirect(w, r, "/", 302)
+			http.Redirect(w, r, "/", http.StatusFound)
 			return
 		}
+
 		log.Print("Invalid user " + email)
-		loginTemplate.Execute(w, nil)
-	default:
 		http.Redirect(w, r, "/login", http.StatusUnauthorized)
+
+	default:
+		http.Redirect(w, r, "/login", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -78,12 +87,18 @@ func SignUpFunc(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	u := parseUser(r)
-	
+	if u == (types.User{}) {
+		http.Redirect(w, r, "/login", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Attempting to sign up with email: ", u.Email)
+
 	e = db.NewUser(&u)
 	if e != nil {
 		http.Error(w, "Unable to sign user up", http.StatusInternalServerError)
 	} else {
-		http.Redirect(w, r, "/login", 302)
+		http.Redirect(w, r, "/login", http.StatusAccepted)
 	}
 }
 
@@ -101,17 +116,23 @@ func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/myprofile", http.StatusUnauthorized)
 	} else {
 		log.Println("sas")
-		http.Redirect(w, r, "/logout/", 302)
+		http.Redirect(w, r, "/logout", http.StatusAccepted)
 	}
 }
 
 func parseUser(r *http.Request) (u types.User) {
 	r.ParseForm()
 
+	hashedPwd, err := utils.EncryptStr(r.Form.Get("password"))
+	if err != nil {
+		log.Print("Error encrypting password: ", err)
+		return
+	}
+
 	u = types.User{
 		UserName: r.Form.Get("user_name"),
-		Email: r.Form.Get("email"),
-		Password: r.Form.Get("password"),
-		Person: r.Form.Get("person")}
+		Email:    r.Form.Get("email"),
+		Password: hashedPwd,
+		Person:   r.Form.Get("person")}
 	return
 }

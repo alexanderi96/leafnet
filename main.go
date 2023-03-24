@@ -22,6 +22,7 @@ func main() {
 	http.HandleFunc("/login", views.LoginFunc)
 	http.HandleFunc("/signup", views.SignUpFunc)
 	http.HandleFunc("/logout", views.RequiresLogin(views.LogoutFunc))
+	http.HandleFunc("/myprofile", views.RequiresLogin(views.UserPage))
 	http.HandleFunc("/delete-user", views.RequiresLogin(views.DeleteMyAccount))
 	//http.HandleFunc("/update-user", views.RequiresLogin(views.UpdateAccountInfo))
 
