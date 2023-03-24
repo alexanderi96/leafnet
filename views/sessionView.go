@@ -33,7 +33,7 @@ func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	loginTemplate.Execute(w, http.StatusFound) //redirect to login irrespective of error or not
+	http.Redirect(w, r, "/login", http.StatusFound) //redirect to login irrespective of error or not
 }
 
 // LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
@@ -98,7 +98,7 @@ func SignUpFunc(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		http.Error(w, "Unable to sign user up", http.StatusInternalServerError)
 	} else {
-		http.Redirect(w, r, "/login", http.StatusAccepted)
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 }
 

@@ -56,11 +56,11 @@ func GetUserPasswdHash(email string) string {
 	return ""
 }
 
-func GetUserInfo(email string) (u types.User, e error) {
+func GetUserInfo(email string) (types.User, error) {
 	session := newSession()
 	defer session.Close()
 
-	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.uuid, u.creation_date, u.last_update, u.user_name, u.email, u.password, u.person`, email)
+	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.uuid as uuid, u.creation_date as creation_date, u.last_update as last_update, u.user_name as user_name, u.email as email, u.password as password, u.person as person`, email)
 	result, err := session.Run(query, nil)
 	if err != nil {
 		log.Println(err)
@@ -68,7 +68,7 @@ func GetUserInfo(email string) (u types.User, e error) {
 	}
 
 	if result.Next() {
-		return *checkRecordAndGetUser(result.Record()), nil
+		return checkRecordAndGetUser(result.Record()), nil
 	}
 
 	return types.User{}, nil
@@ -131,51 +131,36 @@ func NewUser(u *types.User) error {
 	}
 }
 
-func checkRecordAndGetUser(record neo4j.Record) (user *types.User) {
+func checkRecordAndGetUser(record neo4j.Record) types.User {
 
-	user = &types.User{}
+	user := types.User{}
 
-	uuid := record.GetByIndex(0)
-
-	if uuid != nil {
-		user.UUID = uuid.(string)
+	if uuid, ok := record.Get("uuid"); ok && uuid != nil {
+		user.Node.UUID = uuid.(string)
 	}
 
-	creationDate := record.GetByIndex(1)
-
-	if creationDate != nil {
+	if creationDate, ok := record.Get("creation_date"); ok && creationDate != nil {
 		user.Node.CreationDate = creationDate.(int64)
 	}
 
-	lastUpdate := record.GetByIndex(2)
-
-	if lastUpdate != nil {
+	if lastUpdate, ok := record.Get("last_update"); ok && lastUpdate != nil {
 		user.Node.LastUpdate = lastUpdate.(int64)
 	}
 
-	user_name := record.GetByIndex(3)
-
-	if user_name != nil {
+	if user_name, ok := record.Get("user_name"); ok && user_name != nil {
 		user.UserName = user_name.(string)
 	}
 
-	email := record.GetByIndex(4)
-
-	if email != nil {
+	if email, ok := record.Get("email"); ok && email != nil {
 		user.Email = email.(string)
 	}
 
-	password := record.GetByIndex(5)
-
-	if password != nil {
+	if password, ok := record.Get("password"); ok && password != nil {
 		user.Password = password.(string)
 	}
 
-	person := record.GetByIndex(6)
-
-	if person != nil {
+	if person, ok := record.Get("person"); ok && person != nil {
 		user.Person = person.(string)
 	}
-
 	return user
 }

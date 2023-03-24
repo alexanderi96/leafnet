@@ -1,145 +1,53 @@
 {{template "_navbar.html" .}}
-
-<div>
-	<h1>Hi {{.User.UserName}}</h1>
-	<p>
-		Email: {{.User.Email}}<br>
-		Password: {{.User.Password}}<br> 
-		
-		{{if .User.Person}}
-      da inserire i dati della persona collegata all'account
-		{{else}}
-			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#personModal">Redeem a person</button>
-		{{end}}
-		<br>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateaccountModal">update my account</button>
-		<br>
-		<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteaccountModal">Delete my account</button>
-	</p>
-</div>
-
-{{template "_footer.html" .}}
-
-<!-- Modal Cicerone -->
-<div class="modal fade" id="personModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  {{template "_getperson.html" .}}
-</div>
-
-<!-- Delete account Modal -->
-<div class="modal fade" id="deleteaccountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Are you really sure to go away?</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+<div class="container center-block mt-3">
+  <div class="row">
+    <div class="card col-lg shadow">
+      <div class="card-header bg-transparent">
+        <h1 class="card-title">Hi {{.User.UserName}}</h1>
       </div>
-      <div class="modal-body">
-        <form action="/delete-user" method="POST">
-          <p>
-          	Insert your personal information to proceed
-          </p>
-          <div class="loginModal">
-            <label for="email">Email</label>
-            <input type="text" name="email" class="form-control" id="email" placeholder="Enter your email">
-          </div>
-          <div class="loginModal">
-            <label for="passwd">Password</label>
-            <input type="password" name="password" class="form-control" id="passwd" placeholder="Password">
-          </div>
-          <div class="modal-footer">
-          	<button type="button" class="btn btn-secondary" data-dismiss="modal">I changed my mind</button>
-            <input type="submit" value="Yes, delete my account" class="btn btn-danger" />
-          </div>
-        </form>
+      <div class="card-body">
+        Email: {{.User.Email}}<br>
+        Password: {{.User.Password}}<br>
+
+        {{if .User.Person}}
+        da inserire i dati della persona collegata all'account
+        {{else}}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#personModal">Redeem a
+          person</button>
+        {{end}}
       </div>
-      
-    </div>
-  </div>
-</div>
-
-<!-- Modal modify Account -->
-<div class="modal fade" id="updateaccountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modify your account</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form action="/update-user/" method="POST">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" name="name" class="form-control" id="name" placeholder="name">
-          </div>
-          <div class="form-group">
-            <label for="surname">Surname</label>
-            <input type="text" name="surname" class="form-control" id="surname" placeholder="surname">
-          </div>
-
-          <!-- sesso -->
-
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="gender1" value="male">
-            <label class="form-check-label" for="gender1">
-              Male
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="gender2" value="female">
-            <label class="form-check-label" for="gender2">
-              Female
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="gender" id="gender3" value="other">
-            <label class="form-check-label" for="gender3">
-              Other
-            </label>
-          </div>
-
-          <!--datanascita-->
-
+      <div class="card-footer bg-transparent">
+        <div class="row container-fluid">
           <div>
-            Birthday:
-            <input type="date" name="bdate">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateaccountModal">update
+              my account</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteaccountModal">Delete my
+              account</button>
+            <button class="btn btn-secondary" onclick="window.history.back(); location.reload();">Back</button>
           </div>
-          
-          <div class="form-group">
-            <label for="emial">Email</label>
-            <input type="text" name="email"class="form-control" id="email" placeholder="example@example.com">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password"class="form-control" id="password" placeholder="password">
-          </div>
-          <div class="form-group">
-          {{if .User.IsCicerone}}
-            <div class="form-group">
-              <div class="form-group">
-                <label for="tel">Phone Number</label>
-                <input type="text" name="tel" class="form-control" id="tel" placeholder="Enter phone number">
-              </div>
-              <div class="form-group">
-                <label for="fCode">Fiscal code</label>
-                <input type="text" name="fcode" class="form-control" id="fcode" placeholder="Fiscal Code">
-              </div>
-              <div class="form-group">
-                <label for="iban">IBAN</label>
-                <input type="text" name="iban" class="form-control" id="iban" placeholder="IBAN">
-              </div>
-            </div>
-           {{end}}
-          </div>
-          <div class="modal-footer">
-            <input type="submit" value="Update" class="btn btn-outline-primary" />
-          </div>
-        </form>
-
+        </div>
       </div>
     </div>
-  </div>
-</div>
+
+    <!-- Delete account Modal -->
+    <div class="modal fade" id="deleteaccountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+          </div>
+          <div class="modal-body">
+            <h4>Are you sure you want to delete {{.User.UserName}}?</h4>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+              <a class="btn btn-danger" href="/delete-user?uuid={{.User.Node.UUID}}" role="button">Yes</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {{template "_footer.html" .}}

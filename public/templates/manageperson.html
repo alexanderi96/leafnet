@@ -6,7 +6,7 @@
 				{{if not .Person.Node.UUID}}
 				<h1 class="card-title">Add a new person</h1>
 				{{else}}
-				<h1 class="card-title">Edit {{.Person.FirstName}} {{.Person.LastName}}</h1>
+				<h1 class="card-title">View {{.Person.FirstName}} {{.Person.LastName}}</h1>
 				{{end}}
 			</div>
 			<div class="card-body">
@@ -16,19 +16,19 @@
 						<div class="col-md">
 							<label class="form-label" for="first_name">First Name</label>
 							<input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}"
-								class="form-control" placeholder="First Name" required>
+								class="form-control" placeholder="First Name" required {{if .Page.IsDisabled}}disabled{{end}}>
 						</div>
 						<div class="col-md">
 							<label class="form-label" for="last_name">Last Name</label>
 							<input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}"
-								class="form-control" placeholder="Last Name" required>
+								class="form-control" placeholder="Last Name" required {{if .Page.IsDisabled}}disabled{{end}}>
 						</div>
 					</div>
 					<br>
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="birth_date">Birth Date</label>
-							<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder="">
+							<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder="" {{if .Page.IsDisabled}}disabled{{end}}>
 							<script type="text/javascript">
 								setValue("birth_date", timestampToDate({{.Person.BirthDate }}))
 							</script>
@@ -38,10 +38,10 @@
 							<div class="input-group">
 								<div class="input-group-text">
 									<input class="form-check-input" value="" aria-label="Checkbox for following input"
-										type="checkbox" id="enableDeathDate" {{if .Person.DeathDate}}checked{{end}}>
+										type="checkbox" id="enableDeathDate" {{if .Person.DeathDate}}checked{{end}} {{if .Page.IsDisabled}}disabled{{end}}>
 								</div>
 								<input type="date" id="death_date" name="death_date" class="form-control"
-									placeholder="">
+									placeholder="" {{if .Page.IsDisabled}}disabled{{end}}>
 								<script type="text/javascript">
 									setValue("death_date", timestampToDate({{.Person.DeathDate }}))
 								</script>
@@ -53,7 +53,7 @@
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="parent1">Parent 1</label>
-							<select class="form-select" data-placeholder="Parent 1 select" id="parent1">
+							<select class="form-select" data-placeholder="Parent 1 select" id="parent1" {{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
@@ -61,7 +61,7 @@
 						</div>
 						<div class="col-md">
 							<label class="form-label" for="parent2">Parent 2</label>
-							<select class="form-select" data-placeholder="Parent 2 select" id="parent2">
+							<select class="form-select" data-placeholder="Parent 2 select" id="parent2" {{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
@@ -71,26 +71,40 @@
 					</div>
 					<br>
 					{{end}}
+					{{if .Page.IsOwner}}
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="bio">Bio</label>
-							<textarea class="form-control" placeholder="Leave a comment here" id="bio" name="bio"
-								style="height: 150px">{{.Person.Bio}}</textarea>
+							<textarea class="form-control" placeholder="Leave some bio information" id="bio" name="bio"
+								style="height: 150px" {{if .Page.IsDisabled}}disabled{{end}}>{{.Person.Bio}}</textarea>
 						</div>
 					</div>
+					{{end}}
 			</div>
 			<div class="card-footer bg-transparent">
-				<input type="submit" value="Save" class="btn btn-primary" />
-				<button type="button" class="btn btn-danger" data-bs-toggle="modal"
-					data-bs-target="#deleteModal">Delete</button>
-				<button class="btn btn-secondary" onclick="window.history.back(); location.reload();">Back</button>
+				<div class="row container-fluid">
+					<div>
+						{{if or .Page.IsOwner (not .Page.IsDisabled)}}
+						<input type="submit" value="Save" class="btn btn-primary" />
+						<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+						{{end}}
+						<button class="btn btn-secondary" onclick="window.history.back(); location.reload();">Back</button>
+					</div>
+					{{if .Person.Node.UUID}}
+					<div class="d-md-flex justify-content-md-end">
+						<p class="fw-light">
+							Person created by: {{.Person.Node.Owner}} on {{.Person.Node.CreationDate}}. Last update on {{.Person.Node.LastUpdate}}
+						</p>
+					</div>
+					{{end}}
+				  </div>
 			</div>
 			</form>
 		</div>
 	</div>
 </div>
 
-<!-- Modal login -->
+<!-- Modal Delete Person -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
 	aria-hidden="true">
 	<div class="modal-dialog">

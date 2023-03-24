@@ -24,6 +24,15 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		uuid := r.Form.Get("uuid")
 		p.Node.UUID = uuid
 
+		// creation_date := r.Form.Get("creation_date")
+		// p.Node.CreationDate = creation_date
+
+		// last_update := r.Form.Get("last_update")
+		// p.Node.LastUpdate = last_update
+
+		// owner := r.Form.Get("owner")
+		// p.Node.Owner = owner
+
 		firstName := r.Form.Get("first_name")
 		p.FirstName = firstName
 
@@ -66,7 +75,6 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else if r.Method == "GET" {
 		uuid := r.URL.Query().Get("uuid")
-
 		var err error
 		c.Person, err = db.GetPerson(uuid)
 		if err != nil {
@@ -74,7 +82,9 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			c.Person = types.Person{}
 		}
-		log.Println("Viewing: ", c.Person.Node.UUID)
+
+		c.Page.IsOwner = c.Person.Node.Owner == "" || c.Person.Node.Owner == c.User.Email
+		c.Page.IsDisabled = !c.Page.IsOwner
 
 		managePersonTemplate.Execute(w, c)
 	}

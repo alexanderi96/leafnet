@@ -1,11 +1,7 @@
 package views
 
 import (
-	"log"
 	"net/http"
-
-	"github.com/alexanderi96/leafnet/db"
-	"github.com/alexanderi96/leafnet/types"
 )
 
 func UserPage(w http.ResponseWriter, r *http.Request) {
@@ -60,16 +56,17 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else if r.Method == "GET" {
-		email := r.URL.Query().Get("email")
+		// email := r.URL.Query().Get("email")
 
-		var err error
-		c.User, err = db.GetUserInfo(email)
-		if err != nil {
-			// gestisci il caso in cui non ci sia la persona con l'uuid specificato
-			log.Println(err)
-			c.User = types.User{}
-		}
-		log.Println("Viewing: ", c.User)
+		// user, err := db.GetUserInfo(email)
+		// //log.Println(user)
+		// c.User = user
+		// if err != nil {
+		// 	// gestisci il caso in cui non ci sia la persona con l'uuid specificato
+		// 	log.Println(err)
+		// 	c.User = types.User{}
+		// }
+		// //log.Println("Viewing: ", c.User)
 
 		userPagetemplate.Execute(w, c)
 	}
