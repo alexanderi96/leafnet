@@ -28,7 +28,7 @@
       .onChange(orientation => graph && graph.dagMode(orientation));
 
     // graph config
-    const NODE_REL_SIZE = 3;
+    const NODE_REL_SIZE = 5;
     const Y_POSITION_CONSTANT = 1;
     const graph = ForceGraph3D({
       extraRenderers: [new CSS2DRenderer()]
@@ -36,7 +36,7 @@
       .dagMode(null)
       .dagLevelDistance(100)
       // .backgroundColor('#101020')
-      .linkColor(() => 'rgba(255,255,255,0.5)')
+      .linkColor(() => 'rgba(255,255,255,0.8)')
       // .nodeRelSize(NODE_REL_SIZE)
       // .nodeId('id')
       // .nodeVal('value')
@@ -46,7 +46,7 @@
       .linkDirectionalParticles(2)
       .linkDirectionalParticleWidth(0.8)
       .linkDirectionalParticleSpeed(0.005)
-      .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE))
+      .d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE - 2))
       .d3VelocityDecay(0.5);
 
     // Decrease repel intensity
