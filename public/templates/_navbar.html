@@ -25,7 +25,7 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbar">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav me-auto mt-2 mt-lg-0">
 
           {{if .User}}
           <li class="nav-item">
@@ -44,10 +44,20 @@
             </ul>
           </li>
         </ul>
-        <div class="d-flex align-items-center">
-          <!-- things to put on the right side -->
-        </div>
+        <form action="/search" method="POST" class="d-flex input-group w-auto" id="SearchForm">
+          <input
+            type="search"
+            class="form-control rounded"
+            placeholder="Search"
+            aria-label="Search"
+            aria-describedby="search-addon"
+          />
+          <span class="input-group-text border-0" id="search-addon">
+            <i type="submit" class="fas fa-search"></i>
+          </span>
+        </form>
         {{else}}
+      </ul>
         <div class="d-flex align-items-center">
           <button type="button" class="btn btn-light" data-bs-toggle="modal"
             data-bs-target="#loginModal">Signin</button>

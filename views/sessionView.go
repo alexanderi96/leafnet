@@ -71,7 +71,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Print("Invalid user " + email)
-		http.Redirect(w, r, "/login", http.StatusUnauthorized)
+		http.Redirect(w, r, "/login", 401)
 
 	default:
 		http.Redirect(w, r, "/login", http.StatusMethodNotAllowed)

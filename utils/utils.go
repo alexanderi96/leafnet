@@ -24,7 +24,7 @@ func CheckStrHash(str, hash string) bool {
 	// Comparing the password with the hash
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(str)); err != nil {
 		// TODO: Properly handle error
-		log.Fatal(err)
+		log.Println(err)
 		return false
 	}
 	log.Println("Passwords match: ", hash)
