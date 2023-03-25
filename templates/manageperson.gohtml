@@ -54,7 +54,7 @@
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="parent1">Parent 1</label>
-							<select class="form-select" data-placeholder="Parent 1 select" id="parent1" {{if .Page.IsDisabled}}disabled{{end}}>
+							<select class="form-select" name="parent1" data-placeholder="Parent 1 select" id="parent1" {{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
@@ -62,7 +62,7 @@
 						</div>
 						<div class="col-md">
 							<label class="form-label" for="parent2">Parent 2</label>
-							<select class="form-select" data-placeholder="Parent 2 select" id="parent2" {{if .Page.IsDisabled}}disabled{{end}}>
+							<select class="form-select" name="parent2" data-placeholder="Parent 2 select" id="parent2" {{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
