@@ -44,6 +44,7 @@ func PopulateTemplates(templatesFS embed.FS) error {
 	}
 	tmplFiles, err := fs.ReadDir(templatesFS, templatesDir)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 
@@ -54,6 +55,7 @@ func PopulateTemplates(templatesFS embed.FS) error {
 
 		pt, err := template.ParseFS(templatesFS, templatesDir+"/"+tmpl.Name(), layoutsDir+extension)
 		if err != nil {
+			log.Println("Error parsing template: ", err)
 			return err
 		}
 		tmplName := strings.TrimSuffix(tmpl.Name(), filepath.Ext(tmpl.Name()))
