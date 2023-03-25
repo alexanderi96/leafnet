@@ -73,7 +73,7 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 		// }
 		// //log.Println("Viewing: ", c.User)
 
-		userPagetemplate.Execute(w, c)
+		templates["userprofile"].Execute(w, c)
 	}
 
 }

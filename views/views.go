@@ -3,70 +3,63 @@ package views
 /*Holds the fetch related view handlers*/
 
 import (
+	"embed"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
-	"os"
+	"path/filepath"
 	"strings"
 
-	// "strings"
 	// "strconv"
 	"github.com/alexanderi96/leafnet/db"
 	"github.com/alexanderi96/leafnet/sessions"
 	"github.com/alexanderi96/leafnet/types"
 )
 
-// const (
-// 	layoutsDir   = "public/templates"
-// 	templatesDir = "public"
-// 	extension    = "/*.html"
-// )
+const (
+	layoutsDir   = "templates/layouts"
+	templatesDir = "templates"
+	extension    = "/*.gohtml"
+)
 
-// var templates map[string]*template.Template
+var templates map[string]*template.Template
 
-var templates *template.Template
-var homeTemplate *template.Template
-var loginTemplate *template.Template
-var userPagetemplate *template.Template
-var peopleTemplate *template.Template
-var managePersonTemplate *template.Template
-var graphTemplate *template.Template
+// var templates *template.Template
+// var homeTemplate *template.Template
+// var loginTemplate *template.Template
+// var userPagetemplate *template.Template
+// var peopleTemplate *template.Template
+// var managePersonTemplate *template.Template
+// var graphTemplate *template.Template
 
 var c types.Context
 var e error
 
 // PopulateTemplates is used to parse all templates present in
 // the templates folder
-func PopulateTemplates() { //templatesFS embed.FS) {
-	var allFiles []string
-	templatesDir := "./public/templates/"
-	files, err := os.ReadDir(templatesDir)
-	if err != nil {
-		log.Println(err)
-		os.Exit(1) // No point in running app if templates aren't read
+func PopulateTemplates(templatesFS embed.FS) error {
+	if templates == nil {
+		templates = make(map[string]*template.Template)
 	}
-	for _, file := range files {
-		filename := file.Name()
-		if strings.HasSuffix(filename, ".html") {
-			allFiles = append(allFiles, templatesDir+filename)
-		}
+	tmplFiles, err := fs.ReadDir(templatesFS, templatesDir)
+	if err != nil {
+		return err
 	}
 
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+	for _, tmpl := range tmplFiles {
+		if tmpl.IsDir() {
+			continue
+		}
+
+		pt, err := template.ParseFS(templatesFS, templatesDir+"/"+tmpl.Name(), layoutsDir+extension)
+		if err != nil {
+			return err
+		}
+		tmplName := strings.TrimSuffix(tmpl.Name(), filepath.Ext(tmpl.Name()))
+		templates[tmplName] = pt
 	}
-	templates, err = template.ParseFiles(allFiles...)
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	homeTemplate = templates.Lookup("home.html")
-	loginTemplate = templates.Lookup("login.html")
-	userPagetemplate = templates.Lookup("userprofile.html")
-	peopleTemplate = templates.Lookup("people.html")
-	managePersonTemplate = templates.Lookup("manageperson.html")
-	graphTemplate = templates.Lookup("graph.html")
+	return nil
 }
 
 func prepareContext(w http.ResponseWriter, r *http.Request) {

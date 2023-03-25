@@ -3,6 +3,7 @@ package main
 import (
 	// "encoding/json"
 
+	"embed"
 	"log"
 
 	//"html/template"
@@ -15,11 +16,11 @@ import (
 	// "github.com/alexanderi96/leafnet/db"
 )
 
-// go:embed public/templates/*
-//var templatesFS embed.FS
+//go:embed templates/* templates/layouts/*
+var templatesFS embed.FS
 
 func main() {
-	views.PopulateTemplates() //templatesFS)
+	views.PopulateTemplates(templatesFS)
 
 	// login-logout handlers
 	http.HandleFunc("/login", views.LoginFunc)

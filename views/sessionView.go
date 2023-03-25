@@ -22,7 +22,7 @@ func RequiresLogin(handler func(w http.ResponseWriter, r *http.Request)) func(w 
 	}
 }
 
-// LogoutFunc Implements the logout functionality. WIll delete the session information from the cookie store
+// LogoutFunc Implements the logout functionality. WIll delete the session information from the session store
 func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
 	if err == nil { //If there is no error, then remove session
@@ -48,7 +48,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		log.Print("New access to the login page")
-		loginTemplate.Execute(w, nil)
+		templates["login"].Execute(w, c)
 	case "POST":
 		r.ParseForm()
 		email := r.Form.Get("email")
@@ -107,7 +107,7 @@ func HomeFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prepareContext(w, r)
 
-		homeTemplate.Execute(w, c)
+		templates["home"].Execute(w, c)
 	}
 }
 
@@ -115,6 +115,6 @@ func GraphFunc(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		prepareContext(w, r)
 
-		graphTemplate.Execute(w, c)
+		templates["graph"].Execute(w, c)
 	}
 }

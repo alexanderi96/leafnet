@@ -1,4 +1,5 @@
-{{template "_navbar.html" .}}
+{{template "main" .}}
+{{define "content"}}
 <div class="container center-block mt-3">
   <div class="row">
     <div class="card col-lg shadow">
@@ -28,26 +29,27 @@
         </div>
       </div>
     </div>
-
-    <!-- Delete account Modal -->
-    <div class="modal fade" id="deleteaccountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Delete User</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-          </div>
-          <div class="modal-body">
-            <h4>Are you sure you want to delete {{.User.UserName}}?</h4>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-              <a class="btn btn-danger" href="/delete-user?uuid={{.User.Node.UUID}}" role="button">Yes</a>
-            </div>
-          </div>
-
+  </div>
+</div>
+<!-- Delete account Modal -->
+<div class="modal fade" id="deleteaccountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+      </div>
+      <div class="modal-body">
+        <h4>Are you sure you want to delete {{.User.UserName}}?</h4>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <a class="btn btn-danger" href="/delete-user?uuid={{.User.Node.UUID}}" role="button">Yes</a>
         </div>
       </div>
-    </div>
 
-    {{template "_footer.html" .}}
+    </div>
+  </div>
+</div>
+
+{{end}}

@@ -1,4 +1,5 @@
-{{template "_navbar.html" .}}
+{{template "main" .}}
+{{define "content"}}
 <div class="container center-block mt-3">
 	<div class="row">
 		<div class="card col-lg shadow">
@@ -152,4 +153,4 @@
 		}
 	});
 </script>
-{{template "_footer.html" .}}
+{{end}}

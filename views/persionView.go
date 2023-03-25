@@ -77,7 +77,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		c.Page.IsOwner = c.Person.Node.Owner == "" || c.Person.Node.Owner == c.User.Email
 		c.Page.IsDisabled = !c.Page.IsOwner
 
-		managePersonTemplate.Execute(w, c)
+		templates["manageperson"].Execute(w, c)
 	}
 }
 
@@ -98,7 +98,7 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 func ViewPeople(w http.ResponseWriter, r *http.Request) {
 	prepareContext(w, r)
 
-	peopleTemplate.Execute(w, c)
+	templates["people"].Execute(w, c)
 }
 
 // func GetPeople(w http.ResponseWriter, r *http.Request) {

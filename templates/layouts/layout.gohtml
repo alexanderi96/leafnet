@@ -1,0 +1,25 @@
+{{ define "main" }}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Leafnet</title>
+	{{ template "head" . }}
+</head>
+
+<body>
+	<header>
+		{{ template "header" . }}
+	</header>
+	<main>
+		{{ template "content" . }}
+	</main>
+	<footer class="text-center text-lg-start bg-light text-muted fixed-bottom">
+		{{ template "footer" . }}
+	</footer>
+	{{ template "scripts" . }}
+</body>
+
+</html>
+{{ end }}
