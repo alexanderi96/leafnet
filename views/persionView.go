@@ -24,15 +24,6 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		uuid := r.Form.Get("uuid")
 		p.Node.UUID = uuid
 
-		// creation_date := r.Form.Get("creation_date")
-		// p.Node.CreationDate = creation_date
-
-		// last_update := r.Form.Get("last_update")
-		// p.Node.LastUpdate = last_update
-
-		// owner := r.Form.Get("owner")
-		// p.Node.Owner = owner
-
 		firstName := r.Form.Get("first_name")
 		p.FirstName = firstName
 

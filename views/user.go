@@ -1,7 +1,12 @@
 package views
 
 import (
+	"log"
 	"net/http"
+
+	"github.com/alexanderi96/leafnet/db"
+	"github.com/alexanderi96/leafnet/types"
+	"github.com/alexanderi96/leafnet/utils"
 )
 
 func UserPage(w http.ResponseWriter, r *http.Request) {
@@ -70,4 +75,40 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 
 		userPagetemplate.Execute(w, c)
 	}
+
+}
+
+func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	}
+
+	r.ParseForm()
+
+	if e := db.DeleteSelectedUser(r.Form.Get("email"), r.Form.Get("password")); e != nil {
+		log.Print("Error Deleting Account ", e)
+		//TODO: handle better this behaviour
+		http.Redirect(w, r, "/myprofile", http.StatusUnauthorized)
+	} else {
+		log.Println("sas")
+		http.Redirect(w, r, "/logout", http.StatusAccepted)
+	}
+}
+
+func parseUser(r *http.Request) (u types.User) {
+	r.ParseForm()
+
+	hashedPwd, err := utils.EncryptStr(r.Form.Get("password"))
+	if err != nil {
+		log.Print("Error encrypting password: ", err)
+		return
+	}
+
+	u = types.User{
+		UserName: r.Form.Get("user_name"),
+		Email:    r.Form.Get("email"),
+		Password: hashedPwd,
+		Person:   r.Form.Get("person")}
+	return
 }

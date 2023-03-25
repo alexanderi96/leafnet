@@ -15,8 +15,11 @@ import (
 	// "github.com/alexanderi96/leafnet/db"
 )
 
+// go:embed public/templates/*
+//var templatesFS embed.FS
+
 func main() {
-	views.PopulateTemplates()
+	views.PopulateTemplates() //templatesFS)
 
 	// login-logout handlers
 	http.HandleFunc("/login", views.LoginFunc)

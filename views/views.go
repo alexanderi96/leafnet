@@ -6,6 +6,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	// "strings"
 	// "strconv"
@@ -15,8 +17,12 @@ import (
 )
 
 // const (
-// 	token = "abcd"
+// 	layoutsDir   = "public/templates"
+// 	templatesDir = "public"
+// 	extension    = "/*.html"
 // )
+
+// var templates map[string]*template.Template
 
 var templates *template.Template
 var homeTemplate *template.Template
@@ -28,6 +34,40 @@ var graphTemplate *template.Template
 
 var c types.Context
 var e error
+
+// PopulateTemplates is used to parse all templates present in
+// the templates folder
+func PopulateTemplates() { //templatesFS embed.FS) {
+	var allFiles []string
+	templatesDir := "./public/templates/"
+	files, err := os.ReadDir(templatesDir)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1) // No point in running app if templates aren't read
+	}
+	for _, file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, ".html") {
+			allFiles = append(allFiles, templatesDir+filename)
+		}
+	}
+
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	templates, err = template.ParseFiles(allFiles...)
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	homeTemplate = templates.Lookup("home.html")
+	loginTemplate = templates.Lookup("login.html")
+	userPagetemplate = templates.Lookup("userprofile.html")
+	peopleTemplate = templates.Lookup("people.html")
+	managePersonTemplate = templates.Lookup("manageperson.html")
+	graphTemplate = templates.Lookup("graph.html")
+}
 
 func prepareContext(w http.ResponseWriter, r *http.Request) {
 	//load user info
@@ -75,29 +115,4 @@ func prepareContext(w http.ResponseWriter, r *http.Request) {
 // 	}
 
 // 	return true
-// }
-
-// TODO: add ability to filter displayed events
-func HomeFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-
-		homeTemplate.Execute(w, c)
-	}
-}
-
-func GraphFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-
-		graphTemplate.Execute(w, c)
-	}
-}
-
-// func MyProfile(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method == "GET" {
-// 		prepareContext(w, r)
-
-// 		userPagetemplate.Execute(w, c)
-// 	}
 // }

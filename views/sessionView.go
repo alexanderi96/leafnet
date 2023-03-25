@@ -102,37 +102,19 @@ func SignUpFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Redirect(w, r, "/", http.StatusBadRequest)
-		return
-	}
+// TODO: add ability to filter displayed events
+func HomeFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		prepareContext(w, r)
 
-	r.ParseForm()
-
-	if e := db.DeleteSelectedUser(r.Form.Get("email"), r.Form.Get("password")); e != nil {
-		log.Print("Error Deleting Account ", e)
-		//TODO: handle better this behaviour
-		http.Redirect(w, r, "/myprofile", http.StatusUnauthorized)
-	} else {
-		log.Println("sas")
-		http.Redirect(w, r, "/logout", http.StatusAccepted)
+		homeTemplate.Execute(w, c)
 	}
 }
 
-func parseUser(r *http.Request) (u types.User) {
-	r.ParseForm()
+func GraphFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		prepareContext(w, r)
 
-	hashedPwd, err := utils.EncryptStr(r.Form.Get("password"))
-	if err != nil {
-		log.Print("Error encrypting password: ", err)
-		return
+		graphTemplate.Execute(w, c)
 	}
-
-	u = types.User{
-		UserName: r.Form.Get("user_name"),
-		Email:    r.Form.Get("email"),
-		Password: hashedPwd,
-		Person:   r.Form.Get("person")}
-	return
 }
