@@ -15,7 +15,7 @@
 
   <style>
     .node-label {
-      font-size: 10px;
+      font-size: 12px;
       padding: 1px 4px;
       border-radius: 4px;
       background-color: rgba(0,0,0,0.5);
@@ -45,8 +45,8 @@
     })
       .dagMode(null)
       .dagLevelDistance(100)
-      // .backgroundColor('#101020')
-      .linkColor(() => 'rgba(255,255,255,0.8)')
+      .backgroundColor('#101020')
+      .linkColor(() => 'rgba(255,255,255,0.5)')
       .nodeRelSize(NODE_REL_SIZE)
       // .nodeId('id')
       // .nodeVal('value')
@@ -54,57 +54,57 @@
       // .nodeAutoColorBy('last_name')
       .nodeOpacity(0.9)
       .linkDirectionalParticles(2)
-      .linkDirectionalParticleWidth(0.8)
-      .linkDirectionalParticleSpeed(0.005)
+      .linkDirectionalParticleColor(() => 'rgba(255,255,255,1)')
+      .linkDirectionalParticleWidth(2)
+      .linkDirectionalParticleSpeed(0.002)
       //.d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE - 2))
-      .d3VelocityDecay(0.5)
+      // .d3VelocityDecay(0.1)
       .linkWidth(2);
 
     // Decrease repel intensity
     // graph.d3Force('charge').strength(-15);
-    
-    graph.d3Force('link')
-      .distance(link => 0.1)
-      .strength(link => 0.9);
+
+    // graph.d3Force('link')
+    //   .distance(link => 0.9)
+    //   .strength(link => 0.5);
 
 
     function getData(persons) {
-  const nodes = [];
-  const links = [];
+      const nodes = [];
+      const links = [];
 
-  // Crea un oggetto per ogni persona e lo aggiunge all'array nodes
-  persons.forEach((person) => {
-    const node = {
-      id: person.uuid,
-      name: person.first_name + " " + person.last_name,
-      last_name: person.last_name,
-      //size: 150,
-    };
+      // Crea un oggetto per ogni persona e lo aggiunge all'array nodes
+      persons.forEach((person) => {
+        const node = {
+          id: person.uuid,
+          name: person.first_name + " " + person.last_name,
+          last_name: person.last_name,
+        };
 
-    nodes.push(node);
-  });
-
-  // Aggiunge i collegamenti ai genitori all'array links
-  persons.forEach((person) => {
-    if (person.parent1) {
-      links.push({
-        source: person.parent1,
-        target: person.uuid
+        nodes.push(node);
       });
-    }
-    if (person.parent2) {
-      links.push({
-        source: person.parent2,
-        target: person.uuid
-      });
-    }
-  });
 
-  return {
-    nodes: nodes,
-    links: links
-  };
-}
+      // Aggiunge i collegamenti ai genitori all'array links
+      persons.forEach((person) => {
+        if (person.parent1) {
+          links.push({
+            source: person.parent1,
+            target: person.uuid
+          });
+        }
+        if (person.parent2) {
+          links.push({
+            source: person.parent2,
+            target: person.uuid
+          });
+        }
+      });
+
+      return {
+        nodes: nodes,
+        links: links
+      };
+    }
 
     graph(document.getElementById('graph'))
           .graphData(getData({{.Persons}}))
