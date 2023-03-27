@@ -12,6 +12,16 @@
   <script src="//unpkg.com/three"></script>
   <!-- <script src="//unpkg.com/three-spritetext"></script> -->
   <!--<script src="../../dist/3d-force-graph.js"></script>-->
+
+  <style>
+    .node-label {
+      font-size: 10px;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.5);
+      user-select: auto;
+    }
+  </style>
 </head>
 
 <div>
@@ -28,7 +38,7 @@
       .onChange(orientation => graph && graph.dagMode(orientation));
 
     // graph config
-    //const NODE_REL_SIZE = 5;
+    const NODE_REL_SIZE = 5;
     //const Y_POSITION_CONSTANT = 1;
     const graph = ForceGraph3D({
       extraRenderers: [new CSS2DRenderer()]
@@ -37,7 +47,7 @@
       .dagLevelDistance(100)
       // .backgroundColor('#101020')
       .linkColor(() => 'rgba(255,255,255,0.8)')
-      // .nodeRelSize(NODE_REL_SIZE)
+      .nodeRelSize(NODE_REL_SIZE)
       // .nodeId('id')
       // .nodeVal('value')
       // .nodeLabel('name')
@@ -47,14 +57,15 @@
       .linkDirectionalParticleWidth(0.8)
       .linkDirectionalParticleSpeed(0.005)
       //.d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE - 2))
-      .d3VelocityDecay(0.5);
+      .d3VelocityDecay(0.5)
+      .linkWidth(2);
 
     // Decrease repel intensity
     // graph.d3Force('charge').strength(-15);
     
-    // graph.d3Force('link')
-    //   .distance(link => 0.9)
-    //   .strength(link => 0.1);
+    graph.d3Force('link')
+      .distance(link => 0.1)
+      .strength(link => 0.9);
 
 
     function getData(persons) {
@@ -67,7 +78,7 @@
       id: person.uuid,
       name: person.first_name + " " + person.last_name,
       last_name: person.last_name,
-      size: 100,
+      //size: 150,
     };
 
     nodes.push(node);
