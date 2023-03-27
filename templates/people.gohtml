@@ -46,10 +46,10 @@
                 {{end}}
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
+                <a href="/manage-person?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
+                <a href="/manage-person?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
               </td>
             </tr>
             {{end}}
@@ -71,7 +71,7 @@
 
     $('#peopleTable tbody').on('click', 'tr', function () {
       var data = table.row(this).data();
-      location.href = "/manageperson?uuid=" + data[0];
+      location.href = "/manage-person?uuid=" + data[0];
     });
   });
 </script>

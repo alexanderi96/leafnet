@@ -11,12 +11,17 @@ import (
 
 var driver neo4j.Driver
 
-func init() {
+func Init() {
+	if config.Config["neo4j_endpoint"] == "" || config.Config["neo4j_port"] == "" || config.Config["neo4j_schema"] == "" || config.Config["neo4j_username"] == "" || config.Config["neo4j_password"] == "" {
+		log.Fatal("Neo4j config is not set")
+	}
+
 	// Connessione al database
-	log.Println("Initiating db")
+	neo4jUrl := "bolt://" + config.Config["neo4j_endpoint"] + ":" + config.Config["neo4j_port"] + "/" + config.Config["neo4j_schema"] + "/"
+	log.Println("Connecting to database: ", neo4jUrl)
 
 	var err error
-	driver, err = neo4j.NewDriver("bolt://"+config.Config["neo4j_endpoint"]+":"+config.Config["neo4j_port"]+"/"+config.Config["neo4j_schema"]+"/", neo4j.BasicAuth(config.Config["neo4j_username"], config.Config["neo4j_password"], ""), func(c *neo4j.Config) { c.Encrypted = false })
+	driver, err = neo4j.NewDriver(neo4jUrl, neo4j.BasicAuth(config.Config["neo4j_username"], config.Config["neo4j_password"], ""), func(c *neo4j.Config) { c.Encrypted = false })
 	if err != nil {
 		log.Fatalf("Error creating driver: %v", err)
 	}
@@ -72,7 +77,7 @@ func ManagePerson(p *types.Person) error {
 		OPTIONAL MATCH (p2)-[r2:PARENT_OF]->(p)
 		DELETE r1, r2
 
-		SET p.last_update = timestamp(), p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio
+		SET p.last_update = timestamp(), p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio, p.owner = $owner
 	`
 
 	if len(p.UUID) == 0 {
@@ -106,18 +111,14 @@ func ManagePerson(p *types.Person) error {
 	}
 
 	// Esecuzione della query
-	result, err := session.Run(query, params)
-	if err != nil {
-		log.Println(err)
+
+	if res, err := session.Run(query, params); err != nil {
 		return err
+	} else {
+		log.Println(res)
 	}
 
-	// Risultato della query
-	if result.Err() == nil {
-		return nil
-	} else {
-		return result.Err()
-	}
+	return nil
 }
 
 // GetPerson recupera una persona dal database
@@ -139,13 +140,13 @@ func GetPerson(uuid string) (types.Person, error) {
 	}
 }
 
-func GetPersons() []types.Person {
+func GetPersons() ([]types.Person, error) {
 	session := newSession()
 	defer session.Close()
 
 	result, err := session.Run(`MATCH (p:Person) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, nil)
 	if err != nil {
-		log.Fatalf("Error running query: %s\n", err)
+		return nil, err
 	}
 
 	persons := []types.Person{}
@@ -156,7 +157,7 @@ func GetPersons() []types.Person {
 		persons = append(persons, checkRecordAndGetPerson(record))
 	}
 
-	return persons
+	return persons, nil
 }
 
 func DeletePerson(uuid string) (err error) {

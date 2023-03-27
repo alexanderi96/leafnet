@@ -1,11 +1,6 @@
 package types
 
 import (
-	// "crypto/sha256"
-	// "encoding/hex"
-	// "strconv"
-	// "time"
-
 	"github.com/google/uuid"
 )
 

@@ -21,6 +21,7 @@ leafnet*
 .vscode/
 .DS_Store
 Thumbs.db
+*.code-workspace
 
 # Go specific
 bin/
