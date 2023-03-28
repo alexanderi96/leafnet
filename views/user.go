@@ -20,6 +20,7 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 		log.Println("Viewing: ", c.User)
 		if err := templates["userprofile"].Execute(w, c); err != nil {
 			WriteError(w, err)
+			return
 		}
 	}
 
@@ -35,6 +36,7 @@ func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to delete user: ", c.User)
 	if err := db.DeleteSelectedUser(c.User.Email, c.User.Password); err != nil {
 		WriteError(w, err)
+		return
 	}
 
 	log.Println("Account deleted, redirecting...")

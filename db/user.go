@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/alexanderi96/leafnet/types"
 	"github.com/neo4j/neo4j-go-driver/neo4j"
@@ -19,7 +18,6 @@ func ValidUser(email, password string) (bool, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return false, err
 	} else if res.Next() {
-		log.Println(res)
 		record := res.Record()
 		pwd := record.GetByIndex(0)
 		if pwd != nil && pwd.(string) == password {
@@ -38,7 +36,6 @@ func GetUserPasswdHash(email string) (string, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return "", err
 	} else if res.Next() {
-		log.Println(res)
 		record := res.Record()
 		if pwd, ok := record.GetByIndex(0).(string); ok {
 			return pwd, nil
@@ -56,7 +53,6 @@ func GetUserInfoByEmail(email string) (types.User, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return types.User{}, err
 	} else if res.Next() {
-		log.Println(res)
 		return checkRecordAndGetUser(res.Record()), nil
 	}
 
@@ -72,7 +68,6 @@ func GetUserInfoByUserName(user_name string) (types.User, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return types.User{}, err
 	} else if res.Next() {
-		log.Println(res)
 		return checkRecordAndGetUser(res.Record()), nil
 	}
 
@@ -85,10 +80,9 @@ func DeleteSelectedUser(email string, password string) error {
 
 	query := fmt.Sprintf(`MATCH (u:User {email: '%s', password: '%s'}) DETACH DELETE n`, email, password)
 
-	if res, err := session.Run(query, nil); err != nil {
+	if _, err := session.Run(query, nil); err != nil {
 		return err
 	} else {
-		log.Println(res)
 		return nil
 	}
 }
@@ -118,10 +112,9 @@ func NewUser(u *types.User) error {
 
 	// Esecuzione della query
 
-	if res, err := session.Run(query, params); err != nil {
+	if _, err := session.Run(query, params); err != nil {
 		return err
 	} else {
-		log.Println(res)
 		return nil
 	}
 }

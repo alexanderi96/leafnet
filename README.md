@@ -8,7 +8,7 @@ Leafnet is a virtual genealogy tree application written in Go, allowing register
 - Session management with Gorilla sessions
 - Add family members or individuals and specify parent relationships
 - Display past and future anniversaries
-- Visual representation of family relationships using 3D force graphs
+- Visual representation of family relationships using [vasturiano/3D-force-graph](https://github.com/vasturiano/3d-force-graph)
 
 ## Configuration
 

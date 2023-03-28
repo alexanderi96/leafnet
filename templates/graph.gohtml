@@ -1,29 +1,102 @@
 {{template "main" .}}
 {{define "content"}}
-<div id="graph"></div>
+<div id="graph" style="position: relative;"></div>
+<div style="position: absolute; z-index: 1; top: 70px; left: 10px;">
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" style="margin-right: 10px;">
+      <i class="bi bi-gear"></i>
+    </button>
+    <input type="text" id="search-input" class="form-control" placeholder="Search nodes...">
+  </div>
+  <div style="min-height: 120px;">
+    <div class="collapse collapse-horizontal" id="collapseWidthExample">
+      <div class="card card-body" style="width: 300px; margin-top: 10px;">
+        <label for="orientation-select" class="form-label">Graph Orientation</label>
+        <select id="orientation-select" class="form-select">
+          <option value="td">Top-Down</option>
+          <option value="bu">Bottom-Up</option>
+          <option value="lr">Left-Right</option>
+          <option value="rl">Right-Left</option>
+          <option value="zout">Z-out</option>
+          <option value="zin">Z-in</option>
+          <option value="radialout">Radial-Out</option>
+          <option value="radialin">Radial-In</option>
+          <option value="null" selected>None</option>
+        </select>
+        <br>
+        <label for="link-strength" class="form-label">Link Strength</label>
+        <input type="range" class="form-range" id="link-strength" min="0.1" max="1" step="0.1">
+        <br>
+        <label for="link-distance" class="form-label">Link Distance</label>
+        <input type="range" class="form-range" id="link-distance" min="0" max="100">
+        <br>
+        <label for="node-charge" class="form-label">Node Charge Force</label>
+        <input type="range" class="form-range" id="node-charge" min="-15" max="15">
+        
+    </div>
+  </div>
+</div>
 
-<!-- graph! -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-<script src="//unpkg.com/d3-dsv"></script>
-<script src="//unpkg.com/dat.gui"></script>
-
-<script src="//unpkg.com/3d-force-graph"></script>
 
 <script type="importmap">{ "imports": { "three": "https://unpkg.com/three/build/three.module.js" }}</script>
 <script type="module">
   import { CSS2DRenderer, CSS2DObject } from '//unpkg.com/three/examples/jsm/renderers/CSS2DRenderer.js';
+  
+  // change the graph orientation based on the settings
+  const orientationSelect = document.getElementById('orientation-select');
+  orientationSelect.addEventListener('change', (e) => {
+    const orientation = e.target.value;
+    graph && graph.dagMode(orientation);
+  });
 
-  // controls
-  const controls = { 'DAG Orientation': 'td' };
-  const gui = new dat.GUI();
-  gui.add(controls, 'DAG Orientation', ['td', 'bu', 'lr', 'rl', 'zout', 'zin', 'radialout', 'radialin', null])
-    .onChange(orientation => graph && graph.dagMode(orientation));
+  // Event listener per Link Strength slider
+  const linkStrengthSlider = document.getElementById('link-strength');
+  linkStrengthSlider.addEventListener('input', (e) => {
+    const strength = e.target.value;
+    graph.d3Force('link').strength(+strength);
+    graph.numDimensions(3);
+  });
+
+  // Event listener per Link Distance slider
+  const linkDistanceSlider = document.getElementById('link-distance');
+  linkDistanceSlider.addEventListener('input', (e) => {
+    const distance = e.target.value;
+    graph.d3Force('link').distance(+distance);
+    graph.numDimensions(3);
+  });
+
+  // Event listener per Link Distance slider
+  const nodeChargeSlider = document.getElementById('node-charge');
+  nodeChargeSlider.addEventListener('input', (e) => {
+    const distance = e.target.value;
+    graph.d3Force('charge').strength(+distance);
+    graph.numDimensions(3);
+  });
+
+  const searchInput = document.getElementById('search-input');
+
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+
+    if (searchTerm === '') {
+      graph.nodeVisibility(() => true);
+    } else {
+      graph.nodeVisibility(node => {
+        const nodeName = node.name.toLowerCase();
+        return nodeName.includes(searchTerm);
+      });
+    }
+
+    graph.refresh();
+  });
+  
 
   // graph config
   const NODE_REL_SIZE = 5;
   //const Y_POSITION_CONSTANT = 1;
   const graph = ForceGraph3D({
-    extraRenderers: [new CSS2DRenderer()]
+    extraRenderers: [new CSS2DRenderer()],
+    // controlType: 'fly'
   })
     .dagMode(null)
     .dagLevelDistance(100)
