@@ -116,9 +116,8 @@ func ManagePerson(p *types.Person) error {
 		return err
 	} else {
 		log.Println(res)
+		return nil
 	}
-
-	return nil
 }
 
 // GetPerson recupera una persona dal database
@@ -127,14 +126,12 @@ func GetPerson(uuid string) (types.Person, error) {
 	defer session.Close()
 
 	query := fmt.Sprintf(`MATCH (p:Person {uuid: '%s'}) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, uuid)
-	result, err := session.Run(query, nil)
 
-	if err != nil {
+	if res, err := session.Run(query, nil); err != nil {
 		return types.Person{}, err
-	}
-
-	if result.Next() {
-		return checkRecordAndGetPerson(result.Record()), nil
+	} else if res.Next() {
+		log.Println(res)
+		return checkRecordAndGetPerson(res.Record()), nil
 	} else {
 		return types.Person{}, fmt.Errorf("person not found")
 	}
@@ -143,33 +140,32 @@ func GetPerson(uuid string) (types.Person, error) {
 func GetPersons() ([]types.Person, error) {
 	session := newSession()
 	defer session.Close()
+	query := `MATCH (p:Person) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`
 
-	result, err := session.Run(`MATCH (p:Person) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, nil)
-	if err != nil {
+	if res, err := session.Run(query, nil); err != nil {
 		return nil, err
+	} else {
+		log.Println(res)
+		persons := []types.Person{}
+		for res.Next() {
+
+			persons = append(persons, checkRecordAndGetPerson(res.Record()))
+		}
+		return persons, nil
 	}
-
-	persons := []types.Person{}
-
-	for result.Next() {
-		record := result.Record()
-
-		persons = append(persons, checkRecordAndGetPerson(record))
-	}
-
-	return persons, nil
 }
 
-func DeletePerson(uuid string) (err error) {
+func DeletePerson(uuid string) error {
 	session := newSession()
 	defer session.Close()
+	query := fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid)
 
-	_, err = session.Run(fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid), nil)
-	if err != nil {
-		log.Println("Error running query: ", err)
+	if res, err := session.Run(query, nil); err != nil {
+		return err
+	} else {
+		log.Println(res)
+		return nil
 	}
-
-	return
 }
 
 func checkRecordAndGetPerson(record neo4j.Record) types.Person {
