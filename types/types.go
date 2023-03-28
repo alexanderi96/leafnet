@@ -2,16 +2,23 @@ package types
 
 type User struct {
 	Node
-	UserName	string
-	Email		string
-	Password	string
-	Person		string
+	UserName string
+	Email    string
+	Password string
+	Person   string
 }
 
-//Context is the struct passed to templates
+// Context is the struct passed to templates
 type Context struct {
-	User 		//using
-	Person
-	Persons		[]Person
-	CSRFToken  	string
+	User      User //using
+	Person    Person
+	Persons   []Person
+	CSRFToken string
+	Page      Page
+	Error     error
+}
+
+type Page struct {
+	IsDisabled bool
+	IsOwner    bool
 }

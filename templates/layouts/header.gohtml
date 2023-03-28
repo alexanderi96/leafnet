@@ -1,0 +1,115 @@
+{{define "header"}}
+<header>
+  <nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light shadow">
+    <!-- Container wrapper -->
+    <div class="container-fluid">
+      <a class="navbar-brand">Leafnet</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
+        aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbar">
+        {{if gt (len .User.Node.UUID) 0}}
+        <ul class="navbar-nav me-auto mt-2 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{.User.UserName}}
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/my-profile">My Profile</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form action="/search" method="POST" class="d-flex input-group w-auto" id="SearchForm">
+          <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+            aria-describedby="search-addon" />
+          <span class="input-group-text border-0" id="search-addon">
+            <i type="submit" class="fas fa-search"></i>
+          </span>
+        </form>
+        {{else}}
+        <div class="d-flex ms-auto">
+          <button type="button" class="btn btn-light" data-bs-toggle="modal"
+            data-bs-target="#loginModal">Signin</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#signupModal">Signup</button>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- Modal login -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Signin</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+        </div>
+        <div class="modal-body">
+          <form action="/login" method="POST">
+            <div class="form-outline mb-4">
+              <label class="form-label" for="email">Email address</label>
+              <input type="email" name="email" class="form-control" id="email">
+            </div>
+            <div class="form-outline mb-4">
+              <label class="form-label" for="passwd">Password</label>
+              <input type="password" name="password" class="form-control" id="passwd">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <input type="submit" value="Signin" class="btn btn-primary" />
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal signup -->
+  <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Signup</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+        </div>
+        <div class="modal-body">
+          <form action="/signup" method="POST">
+            <div class="form-outline mb-4">
+              <label class="form-label" for="user_name">UserName</label>
+              <input type="text" name="user_name" class="form-control" id="user_name">
+            </div>
+            <div class="form-outline mb-4">
+              <label class="form-label" for="email">Email address</label>
+              <input type="email" name="email" class="form-control" id="email">
+            </div>
+            <div class="form-outline mb-4">
+              <label class="form-label" for="passwd">Password</label>
+              <input type="password" name="password" class="form-control" id="passwd">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <input type="submit" value="Signup" class="btn btn-primary" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+{{end}}

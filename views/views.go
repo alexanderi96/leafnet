@@ -3,12 +3,14 @@ package views
 /*Holds the fetch related view handlers*/
 
 import (
+	"embed"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
-	"time"
+	"path/filepath"
+	"strings"
 
-	// "strings"
 	// "strconv"
 	"github.com/alexanderi96/leafnet/db"
 	"github.com/alexanderi96/leafnet/sessions"
@@ -16,62 +18,66 @@ import (
 )
 
 const (
-	token = "abcd"
+	layoutsDir   = "templates/layouts"
+	templatesDir = "templates"
+	extension    = "/*.gohtml"
 )
 
-var templates *template.Template
-var homeTemplate *template.Template
-var loginTemplate *template.Template
-var profileTemplate *template.Template
-var peopleTemplate *template.Template
-var managePersonTemplate *template.Template
-var graphTemplate *template.Template
+var templates map[string]*template.Template
 
 var c types.Context
-var e error
+
+// PopulateTemplates is used to parse all templates present in
+// the templates folder
+func PopulateTemplates(templatesFS embed.FS) error {
+	if templates == nil {
+		templates = make(map[string]*template.Template)
+	}
+	tmplFiles, err := fs.ReadDir(templatesFS, templatesDir)
+	if err != nil {
+		return err
+	}
+
+	for _, tmpl := range tmplFiles {
+		if tmpl.IsDir() {
+			continue
+		}
+
+		pt, err := template.ParseFS(templatesFS, templatesDir+"/"+tmpl.Name(), layoutsDir+extension)
+		if err != nil {
+			return err
+		}
+		tmplName := strings.TrimSuffix(tmpl.Name(), filepath.Ext(tmpl.Name()))
+		templates[tmplName] = pt
+	}
+	return nil
+}
 
 func prepareContext(w http.ResponseWriter, r *http.Request) {
-	//load user info
-	if c.User, e = db.GetUserInfo(sessions.GetCurrentUser(r)); e != nil {
-		log.Println("Internal server error retriving user info")
-		http.Redirect(w, r, "/", http.StatusInternalServerError)
-	}
+	var err error
+	if user := sessions.GetCurrentUser(r); user != "" {
+		if c.User, err = db.GetUserInfoByEmail(user); err != nil {
+			WriteError(w, err)
 
-	//load persons
-	c.Persons = db.GetPersons()
-}
+		} else if c.Persons, err = db.GetPersons(); err != nil {
+			WriteError(w, err)
 
-func setCookie(w http.ResponseWriter) {
-	c.CSRFToken = token
-	expiration := time.Now().Add(365 * 24 * time.Hour)
-	cookie := http.Cookie{Name: "csrftoken", Value: token, Expires: expiration}
-	http.SetCookie(w, &cookie)
-}
-
-// TODO: add ability to filter displayed events
-func HomeFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		setCookie(w)
-
-		homeTemplate.Execute(w, c)
+		}
+	} else {
+		log.Println("No user logged in, emptying context!")
+		c = types.Context{}
 	}
 }
 
-func GraphFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		setCookie(w)
-
-		graphTemplate.Execute(w, c)
+// write a function to handle errors
+func WriteError(w http.ResponseWriter, err error) {
+	if err == nil {
+		return
 	}
-}
 
-func MyProfile(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		setCookie(w)
-
-		profileTemplate.Execute(w, c)
+	log.Println(err)
+	c.Error = err
+	if err := templates["error"].Execute(w, c); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

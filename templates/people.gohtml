@@ -1,4 +1,5 @@
-{{template "_navbar.html" .}}
+{{template "main" .}}
+{{define "content"}}
 <div class="container center-block mt-3">
   <div class="row">
     <div class="card col-lg shadow">
@@ -6,7 +7,7 @@
         <h1 class="card-title">Persons</h1>
       </div>
       <div class="card-body table-responsive">
-        <table id="peopleTable" class="table table-striped table-bordered dt-responsive nowrap">
+        <table id="peopleTable" class="display table table-striped table-bordered dt-responsive nowrap">
           <thead>
             <tr>
               <th>UUID</th>
@@ -16,12 +17,11 @@
               <th>Death date</th>
               <th>Parent1</th>
               <th>Parent2</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {{range $index, $person := .Persons}}
-            <tr>
+            <tr onclick="">
               <td class="uuid">{{$person.UUID}}</td>
               <td>{{$person.FirstName}}</td>
               <td>{{$person.LastName}}</td>
@@ -46,16 +46,10 @@
                 {{end}}
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
+                <a href="/manage-person?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
-              </td>
-              <td>
-                <form action="/manageperson" method="GET">
-                  <input type="hidden" name="uuid" value="{{$person.UUID}}">
-                  <input type="submit" value="Modifica" class="btn btn-secondary">
-                </form>
+                <a href="/manage-person?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
               </td>
             </tr>
             {{end}}
@@ -68,9 +62,17 @@
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
   $(document).ready(function () {
     $('#peopleTable').DataTable();
+
+    var table = $('#peopleTable').DataTable();
+
+    $('#peopleTable tbody').on('click', 'tr', function () {
+      var data = table.row(this).data();
+      location.href = "/manage-person?uuid=" + data[0];
+    });
   });
 </script>
-{{template "_footer.html" .}}
+{{end}}

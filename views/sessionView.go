@@ -1,71 +1,95 @@
 package views
 
-import(
+import (
+	"errors"
 	"log"
 	"net/http"
 
-	"github.com/alexanderi96/leafnet/types"
 	"github.com/alexanderi96/leafnet/db"
 	"github.com/alexanderi96/leafnet/sessions"
+	"github.com/alexanderi96/leafnet/utils"
 )
 
-//RequiresLogin is a middleware which will be used for each httpHandler to check if there is any active session
+// RequiresLogin is a middleware which will be used for each httpHandler to check if there is any active session
 func RequiresLogin(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !sessions.IsLoggedIn(r) {
+		if !sessions.IsLoggedIn(r) { // || !checkCookie)r) {}
 			log.Print("invalid session")
-			http.Redirect(w, r, "/login", 302)
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
 		handler(w, r)
 	}
 }
 
-
-//LogoutFunc Implements the logout functionality. WIll delete the session information from the cookie store
+// LogoutFunc Implements the logout functionality. WIll delete the session information from the session store
 func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
-	log.Println("Logout function")
-	if err == nil { //If there is no error, then remove session
-		if session.Values["loggedin"] != "false" {
-			session.Values["loggedin"] = "false"
-			session.Save(r, w)
-		}
+	if err != nil {
+		WriteError(w, err)
 	}
-	http.Redirect(w, r, "/login", 302) //redirect to login irrespective of error or not
+
+	//If there is no error, then remove session
+	log.Println("Removing session for user: ", session.Values["email"])
+	if session.Values["loggedin"] != "false" {
+		session.Values["loggedin"] = "false"
+		session.Save(r, w)
+	}
+
+	http.Redirect(w, r, "/login", http.StatusFound) //redirect to login irrespective of error or not
 }
 
-//LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
+// LoginFunc implements the login functionality, will add a cookie to the cookie store for managing authentication
 func LoginFunc(w http.ResponseWriter, r *http.Request) {
+
+	prepareContext(w, r)
 	session, err := sessions.Store.Get(r, "session")
 
 	if err != nil {
-	    http.Error(w, err.Error(), http.StatusInternalServerError)
-	    return
+		WriteError(w, err)
 	}
 
 	switch r.Method {
 	case "GET":
-		log.Print("Inside GET")
-		loginTemplate.Execute(w, nil)
+		log.Print("New access to the login page")
+		if err := templates["login"].Execute(w, c); err != nil {
+			WriteError(w, err)
+		}
+
 	case "POST":
-		log.Print("Inside POST")
 		r.ParseForm()
 		email := r.Form.Get("email")
 		password := r.Form.Get("password")
 
-		if (email != "" && password != "") && db.ValidUser(email, password) {
-			session.Values["loggedin"] = "true"
-			session.Values["email"] = email
-			session.Save(r, w)
-			log.Print("user ", email, " is authenticated")
-			http.Redirect(w, r, "/", 302)
+		log.Print("Attempting to login with email: ", email)
+
+		if hash, err := db.GetUserPasswdHash(email); err != nil {
+			WriteError(w, err)
+
+		} else if hash == "" {
+			log.Print("User not found")
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		} else if res, err := utils.CheckStrHash(password, hash); err != nil || !res {
+			log.Print("Wrong password")
+			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
-		log.Print("Invalid user " + email)
-		loginTemplate.Execute(w, nil)
+
+		session.Values["loggedin"] = "true"
+		session.Values["email"] = email
+		session.Options.MaxAge = 3600 // imposto l'età massima della sessione a 1 ora
+
+		if err := session.Save(r, w); err != nil {
+			WriteError(w, err)
+		}
+
+		log.Print("user ", email, " is authenticated")
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+
 	default:
-		http.Redirect(w, r, "/login", http.StatusUnauthorized)
+		WriteError(w, errors.New("invalid method"))
 	}
 }
 
@@ -77,41 +101,42 @@ func SignUpFunc(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 
-	u := parseUser(r)
-	
-	e = db.NewUser(&u)
-	if e != nil {
-		http.Error(w, "Unable to sign user up", http.StatusInternalServerError)
-	} else {
-		http.Redirect(w, r, "/login", 302)
+	u, err := parseUser(r)
+	log.Println("Attempting to sign up with Email: ", u.Email, " and UserName: ", u.UserName)
+
+	if err != nil {
+		WriteError(w, err)
+	} else if exists, err := checkIfUserExists(u); err != nil {
+		WriteError(w, err)
+	} else if exists {
+		WriteError(w, errors.New("user already exists"))
+	}
+
+	if err = db.NewUser(&u); err != nil {
+		WriteError(w, err)
+	}
+
+	log.Println("User ", u.UserName, " has been created")
+	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+// TODO: add ability to filter displayed events
+func HomeFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		prepareContext(w, r)
+		log.Println("Attempting to access home page")
+		if err := templates["home"].Execute(w, c); err != nil {
+			WriteError(w, err)
+		}
 	}
 }
 
-func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Redirect(w, r, "/", http.StatusBadRequest)
-		return
+func GraphFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		prepareContext(w, r)
+		log.Println("Attempting to access graph page")
+		if err := templates["graph"].Execute(w, c); err != nil {
+			WriteError(w, err)
+		}
 	}
-
-	r.ParseForm()
-
-	if e := db.DeleteSelectedUser(r.Form.Get("email"), r.Form.Get("password")); e != nil {
-		log.Print("Error Deleting Account ", e)
-		//TODO: handle better this behaviour
-		http.Redirect(w, r, "/myprofile", http.StatusUnauthorized)
-	} else {
-		log.Println("sas")
-		http.Redirect(w, r, "/logout/", 302)
-	}
-}
-
-func parseUser(r *http.Request) (u types.User) {
-	r.ParseForm()
-
-	u = types.User{
-		UserName: r.Form.Get("user_name"),
-		Email: r.Form.Get("email"),
-		Password: r.Form.Get("password"),
-		Person: r.Form.Get("person")}
-	return
 }

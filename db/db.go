@@ -11,12 +11,17 @@ import (
 
 var driver neo4j.Driver
 
-func init() {
+func Init() {
+	if config.Config["neo4j_endpoint"] == "" || config.Config["neo4j_port"] == "" || config.Config["neo4j_schema"] == "" || config.Config["neo4j_username"] == "" || config.Config["neo4j_password"] == "" {
+		log.Fatal("Neo4j config is not set")
+	}
+
 	// Connessione al database
-	log.Println("Initiating db")
+	neo4jUrl := "bolt://" + config.Config["neo4j_endpoint"] + ":" + config.Config["neo4j_port"] + "/" + config.Config["neo4j_schema"] + "/"
+	log.Println("Connecting to database: ", neo4jUrl)
 
 	var err error
-	driver, err = neo4j.NewDriver("bolt://"+config.Config["neo4j_endpoint"]+":"+config.Config["neo4j_port"]+"/"+config.Config["neo4j_schema"]+"/", neo4j.BasicAuth(config.Config["neo4j_username"], config.Config["neo4j_password"], ""), func(c *neo4j.Config) { c.Encrypted = false })
+	driver, err = neo4j.NewDriver(neo4jUrl, neo4j.BasicAuth(config.Config["neo4j_username"], config.Config["neo4j_password"], ""), func(c *neo4j.Config) { c.Encrypted = false })
 	if err != nil {
 		log.Fatalf("Error creating driver: %v", err)
 	}
@@ -24,12 +29,10 @@ func init() {
 }
 
 func newSession() neo4j.Session {
-	log.Println("Initiating session")
 	session, err := driver.Session(neo4j.AccessModeWrite)
 	if err != nil {
 		log.Fatalf("Error creating session: %v", err)
 	}
-	log.Println("Session initiated")
 	//defer session.Close()
 	return session
 }
@@ -74,12 +77,12 @@ func ManagePerson(p *types.Person) error {
 		OPTIONAL MATCH (p2)-[r2:PARENT_OF]->(p)
 		DELETE r1, r2
 
-		SET p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio, p.last_update = timestamp()
+		SET p.last_update = timestamp(), p.first_name = $first_name, p.last_name = $last_name, p.birth_date = $birth_date, p.death_date = $death_date, p.parent1 = $parent1, p.parent2 = $parent2, p.bio = $bio, p.owner = $owner
 	`
 
 	if len(p.UUID) == 0 {
 		p.CreateUUID()
-		query += `, p.creation_date = timestamp()`
+		query += `, p.creation_date = timestamp(), p.owner = $owner`
 	}
 
 	query += `
@@ -97,6 +100,7 @@ func ManagePerson(p *types.Person) error {
 
 	params := map[string]interface{}{
 		"uuid":       p.Node.UUID,
+		"owner":      p.Node.Owner,
 		"first_name": p.FirstName,
 		"last_name":  p.LastName,
 		"birth_date": p.BirthDate,
@@ -107,17 +111,12 @@ func ManagePerson(p *types.Person) error {
 	}
 
 	// Esecuzione della query
-	result, err := session.Run(query, params)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 
-	// Risultato della query
-	if result.Err() == nil {
-		return nil
+	if res, err := session.Run(query, params); err != nil {
+		return err
 	} else {
-		return result.Err()
+		log.Println(res)
+		return nil
 	}
 }
 
@@ -126,94 +125,95 @@ func GetPerson(uuid string) (types.Person, error) {
 	session := newSession()
 	defer session.Close()
 
-	query := fmt.Sprintf(`MATCH (p:Person {uuid: '%s'}) RETURN p.uuid, p.creation_date as creation_date, p.last_update as last_update, p.first_name, p.last_name, p.birth_date, p.death_date, p.parent1, p.parent2, p.bio`, uuid)
-	result, err := session.Run(query, nil)
+	query := fmt.Sprintf(`MATCH (p:Person {uuid: '%s'}) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, uuid)
 
-	if err != nil {
+	if res, err := session.Run(query, nil); err != nil {
 		return types.Person{}, err
-	}
-
-	if result.Next() {
-		return checkRecordAndGetPerson(result.Record()), nil
+	} else if res.Next() {
+		log.Println(res)
+		return checkRecordAndGetPerson(res.Record()), nil
 	} else {
 		return types.Person{}, fmt.Errorf("person not found")
 	}
 }
 
-func GetPersons() []types.Person {
+func GetPersons() ([]types.Person, error) {
 	session := newSession()
 	defer session.Close()
+	query := `MATCH (p:Person) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`
 
-	result, err := session.Run(`MATCH (p:Person) RETURN p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, nil)
-	if err != nil {
-		log.Fatalf("Error running query: %s\n", err)
+	if res, err := session.Run(query, nil); err != nil {
+		return nil, err
+	} else {
+		log.Println(res)
+		persons := []types.Person{}
+		for res.Next() {
+
+			persons = append(persons, checkRecordAndGetPerson(res.Record()))
+		}
+		return persons, nil
 	}
-
-	persons := []types.Person{}
-
-	for result.Next() {
-		record := result.Record()
-
-		persons = append(persons, checkRecordAndGetPerson(record))
-	}
-
-	return persons
 }
 
-func DeletePerson(uuid string) (err error) {
+func DeletePerson(uuid string) error {
 	session := newSession()
 	defer session.Close()
+	query := fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid)
 
-	_, err = session.Run(fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid), nil)
-	if err != nil {
-		log.Println("Error running query: ", err)
+	if res, err := session.Run(query, nil); err != nil {
+		return err
+	} else {
+		log.Println(res)
+		return nil
 	}
-
-	return
 }
 
-func checkRecordAndGetPerson(record neo4j.Record) (person types.Person) {
+func checkRecordAndGetPerson(record neo4j.Record) types.Person {
 
-	person = types.Person{}
+	person := types.Person{}
 
-	if uuid, ok := record.GetByIndex(0).(string); ok {
-		person.Node.UUID = uuid
+	if uuid, ok := record.Get("uuid"); ok && uuid != nil {
+		person.Node.UUID = uuid.(string)
 	}
 
-	if creationDate, ok := record.GetByIndex(1).(int64); ok {
-		person.Node.CreationDate = creationDate
+	if creationDate, ok := record.Get("creation_date"); ok && creationDate != nil {
+		person.Node.CreationDate = creationDate.(int64)
 	}
 
-	if lastUpdate, ok := record.GetByIndex(2).(int64); ok {
-		person.Node.LastUpdate = lastUpdate
+	if lastUpdate, ok := record.Get("last_update"); ok && lastUpdate != nil {
+		person.Node.LastUpdate = lastUpdate.(int64)
 	}
 
-	if firstName, ok := record.GetByIndex(3).(string); ok {
-		person.FirstName = firstName
+	if owner, ok := record.Get("owner"); ok && owner != nil {
+		person.Node.Owner = owner.(string)
 	}
 
-	if lastName, ok := record.GetByIndex(4).(string); ok {
-		person.LastName = lastName
+	if firstName, ok := record.Get("first_name"); ok && firstName != nil {
+		person.FirstName = firstName.(string)
 	}
 
-	if birthDate, ok := record.GetByIndex(5).(int64); ok {
-		person.BirthDate = birthDate
+	if lastName, ok := record.Get("last_name"); ok && lastName != nil {
+		person.LastName = lastName.(string)
 	}
 
-	if deathDate, ok := record.GetByIndex(6).(int64); ok {
-		person.DeathDate = deathDate
+	if birthDate, ok := record.Get("birth_date"); ok && birthDate != nil {
+		person.BirthDate = birthDate.(int64)
 	}
 
-	if parent1, ok := record.GetByIndex(7).(string); ok {
-		person.Parent1 = parent1
+	if deathDate, ok := record.Get("death_date"); ok && deathDate != nil {
+		person.DeathDate = deathDate.(int64)
 	}
 
-	if parent2, ok := record.GetByIndex(8).(string); ok {
-		person.Parent2 = parent2
+	if parent1, ok := record.Get("parent1"); ok && parent1 != nil {
+		person.Parent1 = parent1.(string)
 	}
 
-	if bio, ok := record.GetByIndex(9).(string); ok {
-		person.Bio = bio
+	if parent2, ok := record.Get("parent2"); ok && parent2 != nil {
+		person.Parent2 = parent2.(string)
+	}
+
+	if bio, ok := record.Get("bio"); ok && bio != nil {
+		person.Bio = bio.(string)
 	}
 
 	return person
