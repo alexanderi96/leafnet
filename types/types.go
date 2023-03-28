@@ -10,11 +10,12 @@ type User struct {
 
 // Context is the struct passed to templates
 type Context struct {
-	User //using
-	Person
+	User      User //using
+	Person    Person
 	Persons   []Person
 	CSRFToken string
-	Page
+	Page      Page
+	Error     error
 }
 
 type Page struct {

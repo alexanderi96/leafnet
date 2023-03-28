@@ -1,4 +1,5 @@
-{{template "_navbar.html" .}}
+{{template "main" .}}
+{{define "content"}}
 <div class="container center-block mt-3">
   <div class="row">
     <div class="card col-lg shadow">
@@ -45,10 +46,10 @@
                 {{end}}
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
+                <a href="/manage-person?uuid={{$person.Parent1}}">{{$person.Parent1}}</a>
               </td>
               <td class="uuid">
-                <a href="/manageperson?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
+                <a href="/manage-person?uuid={{$person.Parent2}}">{{$person.Parent2}}</a>
               </td>
             </tr>
             {{end}}
@@ -61,16 +62,17 @@
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
   $(document).ready(function () {
     $('#peopleTable').DataTable();
 
     var table = $('#peopleTable').DataTable();
- 
+
     $('#peopleTable tbody').on('click', 'tr', function () {
-        var data = table.row(this).data();
-        location.href = "/manageperson?uuid=" + data[0];
+      var data = table.row(this).data();
+      location.href = "/manage-person?uuid=" + data[0];
     });
   });
 </script>
-{{template "_footer.html" .}}
+{{end}}

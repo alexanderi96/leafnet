@@ -1,20 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  {{template "_cdn.html"}}
-
-  {{template "_js.html" .}}
-
-  {{template "_css.html" .}}
-
-  <title>Leafnet</title>
-</head>
-
-<body>
+{{define "header"}}
+<header>
   <nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light shadow">
     <!-- Container wrapper -->
     <div class="container-fluid">
@@ -25,9 +10,8 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbar">
+        {{if gt (len .User.Node.UUID) 0}}
         <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-
-          {{if .User}}
           <li class="nav-item">
             <a class="nav-link" href="/">Home</a>
           </li>
@@ -36,7 +20,7 @@
               {{.User.UserName}}
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/myprofile">My Profile</a></li>
+              <li><a class="dropdown-item" href="/my-profile">My Profile</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -45,20 +29,14 @@
           </li>
         </ul>
         <form action="/search" method="POST" class="d-flex input-group w-auto" id="SearchForm">
-          <input
-            type="search"
-            class="form-control rounded"
-            placeholder="Search"
-            aria-label="Search"
-            aria-describedby="search-addon"
-          />
+          <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+            aria-describedby="search-addon" />
           <span class="input-group-text border-0" id="search-addon">
             <i type="submit" class="fas fa-search"></i>
           </span>
         </form>
         {{else}}
-      </ul>
-        <div class="d-flex align-items-center">
+        <div class="d-flex ms-auto">
           <button type="button" class="btn btn-light" data-bs-toggle="modal"
             data-bs-target="#loginModal">Signin</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal"
@@ -132,4 +110,6 @@
       </div>
     </div>
   </div>
-  <main>
+
+</header>
+{{end}}

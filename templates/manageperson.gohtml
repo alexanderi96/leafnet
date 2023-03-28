@@ -1,4 +1,5 @@
-{{template "_navbar.html" .}}
+{{template "main" .}}
+{{define "content"}}
 <div class="container center-block mt-3">
 	<div class="row">
 		<div class="card col-lg shadow">
@@ -10,8 +11,9 @@
 				{{end}}
 			</div>
 			<div class="card-body">
-				<form id="addpersonform" method="POST" action="/manageperson">
+				<form id="addpersonform" method="POST" action="/manage-person">
 					<input type="hidden" id="uuid" name="uuid" value="{{.Person.Node.UUID}}" class="form-control">
+					<input type="hidden" id="owner" name="owner" value="{{.Person.Node.Owner}}" class="form-control">
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="first_name">First Name</label>
@@ -88,12 +90,22 @@
 						<input type="submit" value="Save" class="btn btn-primary" />
 						<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
 						{{end}}
-						<button class="btn btn-secondary" onclick="window.history.back(); location.reload();">Back</button>
+						<button class="btn btn-secondary" onclick="window.history.back()">Back</button>
 					</div>
 					{{if .Person.Node.UUID}}
 					<div class="d-md-flex justify-content-md-end">
 						<p class="fw-light">
-							Person created by: {{.Person.Node.Owner}} on {{.Person.Node.CreationDate}}. Last update on {{.Person.Node.LastUpdate}}
+							Person created by: {{.Person.Node.Owner}}
+							<span id="creation_date_info_span" />
+							<script type="text/javascript">
+							setInnerText("creation_date_info_span", "on " + timestampToDate({{.Person.Node.CreationDate}}) + ". ")
+							</script>
+							</span>
+							<span id="last_update_info_span" />
+							<script type="text/javascript">
+							setInnerText("last_update_info_span", "Last update on " + timestampToDate({{.Person.Node.CreationDate}}) + ".")
+							</script>
+							</span>
 						</p>
 					</div>
 					{{end}}
@@ -152,4 +164,4 @@
 		}
 	});
 </script>
-{{template "_footer.html" .}}
+{{end}}

@@ -10,65 +10,70 @@ import (
 
 // ValidUser will check if the user exists in db and if exists if the username password
 // combination is valid
-func ValidUser(email, password string) bool {
+func ValidUser(email, password string) (bool, error) {
 	session := newSession()
 	defer session.Close()
 
 	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.password`, email)
-	result, err := session.Run(query, nil)
 
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	if result.Next() {
-		record := result.Record()
+	if res, err := session.Run(query, nil); err != nil {
+		return false, err
+	} else if res.Next() {
+		log.Println(res)
+		record := res.Record()
 		pwd := record.GetByIndex(0)
 		if pwd != nil && pwd.(string) == password {
-			return true
+			return true, nil
 		}
 	}
-
-	return false
+	return false, nil
 }
 
-func GetUserPasswdHash(email string) string {
+func GetUserPasswdHash(email string) (string, error) {
 	session := newSession()
 	defer session.Close()
 
 	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.password`, email)
-	result, err := session.Run(query, nil)
 
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-
-	if result.Next() {
-		record := result.Record()
-
+	if res, err := session.Run(query, nil); err != nil {
+		return "", err
+	} else if res.Next() {
+		log.Println(res)
+		record := res.Record()
 		if pwd, ok := record.GetByIndex(0).(string); ok {
-			return pwd
+			return pwd, nil
 		}
 	}
-
-	return ""
+	return "", nil
 }
 
-func GetUserInfo(email string) (types.User, error) {
+func GetUserInfoByEmail(email string) (types.User, error) {
 	session := newSession()
 	defer session.Close()
 
 	query := fmt.Sprintf(`MATCH (u:User {email: '%s'}) RETURN u.uuid as uuid, u.creation_date as creation_date, u.last_update as last_update, u.user_name as user_name, u.email as email, u.password as password, u.person as person`, email)
-	result, err := session.Run(query, nil)
-	if err != nil {
-		log.Println(err)
+
+	if res, err := session.Run(query, nil); err != nil {
 		return types.User{}, err
+	} else if res.Next() {
+		log.Println(res)
+		return checkRecordAndGetUser(res.Record()), nil
 	}
 
-	if result.Next() {
-		return checkRecordAndGetUser(result.Record()), nil
+	return types.User{}, nil
+}
+
+func GetUserInfoByUserName(user_name string) (types.User, error) {
+	session := newSession()
+	defer session.Close()
+
+	query := fmt.Sprintf(`MATCH (u:User {user_name: '%s'}) RETURN u.uuid as uuid, u.creation_date as creation_date, u.last_update as last_update, u.user_name as user_name, u.email as email, u.password as password, u.person as person`, user_name)
+
+	if res, err := session.Run(query, nil); err != nil {
+		return types.User{}, err
+	} else if res.Next() {
+		log.Println(res)
+		return checkRecordAndGetUser(res.Record()), nil
 	}
 
 	return types.User{}, nil
@@ -80,13 +85,12 @@ func DeleteSelectedUser(email string, password string) error {
 
 	query := fmt.Sprintf(`MATCH (u:User {email: '%s', password: '%s'}) DETACH DELETE n`, email, password)
 
-	_, err := session.Run(query, nil)
-	if err != nil {
-		log.Println(err)
+	if res, err := session.Run(query, nil); err != nil {
 		return err
+	} else {
+		log.Println(res)
+		return nil
 	}
-
-	return nil
 }
 
 // NewPerson crea un nuovo nodo User su neo4j, o lo aggiorna se gia presente
@@ -112,22 +116,13 @@ func NewUser(u *types.User) error {
 		"person":    "" + u.Person,
 	}
 
-	log.Println("before execute NewUser")
-
 	// Esecuzione della query
-	result, err := session.Run(query, params)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 
-	// Risultato della query
-	if result.Err() == nil {
-		log.Println(result)
-		return nil
+	if res, err := session.Run(query, params); err != nil {
+		return err
 	} else {
-		log.Println(result.Err())
-		return result.Err()
+		log.Println(res)
+		return nil
 	}
 }
 
