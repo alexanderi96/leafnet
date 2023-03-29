@@ -29,7 +29,7 @@
                 {{if $person.BirthDate}}
                 <span id="{{$index}}_birth_date" />
                 <script type="text/javascript">
-                  setInnerText("{{$index}}_birth_date", timestampToDate({{ $person.BirthDate }}))
+                  setInnerText("{{$index}}_birth_date", timestampSecondsToDate({{ $person.BirthDate }}))
                 </script>
                 {{else}}
                 <span id="{{$index}}_birth_date">-</span>
@@ -39,7 +39,7 @@
                 {{if $person.DeathDate}}
                 <span id="{{$index}}_death_date" />
                 <script type="text/javascript">
-                  setInnerText("{{$index}}_death_date", timestampToDate({{ $person.DeathDate }}))
+                  setInnerText("{{$index}}_death_date", timestampSecondsToDate({{ $person.DeathDate }}))
                 </script>
                 {{else}}
                 <span id="{{$index}}_death_date">-</span>

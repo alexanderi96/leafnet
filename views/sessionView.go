@@ -27,6 +27,7 @@ func LogoutFunc(w http.ResponseWriter, r *http.Request) {
 	session, err := sessions.Store.Get(r, "session")
 	if err != nil {
 		WriteError(w, err)
+		return
 	}
 
 	//If there is no error, then remove session
@@ -47,6 +48,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		WriteError(w, err)
+		return
 	}
 
 	switch r.Method {
@@ -54,6 +56,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 		log.Print("New access to the login page")
 		if err := templates["login"].Execute(w, c); err != nil {
 			WriteError(w, err)
+			return
 		}
 
 	case "POST":
@@ -65,6 +68,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 
 		if hash, err := db.GetUserPasswdHash(email); err != nil {
 			WriteError(w, err)
+			return
 
 		} else if hash == "" {
 			log.Print("User not found")
@@ -82,6 +86,7 @@ func LoginFunc(w http.ResponseWriter, r *http.Request) {
 
 		if err := session.Save(r, w); err != nil {
 			WriteError(w, err)
+			return
 		}
 
 		log.Print("user ", email, " is authenticated")
@@ -106,14 +111,17 @@ func SignUpFunc(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		WriteError(w, err)
+		return
 	} else if exists, err := checkIfUserExists(u); err != nil {
 		WriteError(w, err)
+		return
 	} else if exists {
 		WriteError(w, errors.New("user already exists"))
 	}
 
 	if err = db.NewUser(&u); err != nil {
 		WriteError(w, err)
+		return
 	}
 
 	log.Println("User ", u.UserName, " has been created")
@@ -127,16 +135,7 @@ func HomeFunc(w http.ResponseWriter, r *http.Request) {
 		log.Println("Attempting to access home page")
 		if err := templates["home"].Execute(w, c); err != nil {
 			WriteError(w, err)
-		}
-	}
-}
-
-func GraphFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		log.Println("Attempting to access graph page")
-		if err := templates["graph"].Execute(w, c); err != nil {
-			WriteError(w, err)
+			return
 		}
 	}
 }

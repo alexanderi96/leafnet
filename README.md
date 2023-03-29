@@ -8,19 +8,19 @@ Leafnet is a virtual genealogy tree application written in Go, allowing register
 - Session management with Gorilla sessions
 - Add family members or individuals and specify parent relationships
 - Display past and future anniversaries
-- Visual representation of family relationships using 3D force graphs
+- Visual representation of family relationships using [vasturiano/3D-force-graph](https://github.com/vasturiano/3d-force-graph)
 
 ## Configuration
 
-Leafnet uses a YAML configuration file with the following structure:
+Leafnet uses a toml configuration file with the following structure:
 
 ```
-neo4j_endpoint: "neo4j-db-endpoint"
-neo4j_port: "neo4j-db-port"
-neo4j_schema: "neo4j-db-schema"
-neo4j_username: "neo4j-db-username"
-neo4j_password: ".neo4j-db-password"
-leafnet_port: "leafnet-port"
+neo4j_endpoint = "neo4j-db-endpoint"
+neo4j_port = "neo4j-db-port"
+neo4j_schema = "neo4j-db-schema"
+neo4j_username = "neo4j-db-username"
+neo4j_password = ".neo4j-db-password"
+leafnet_port = "leafnet-port"
 ```
 
 ## Tech Stack
@@ -51,7 +51,7 @@ Compile the application:
 go build
 ```
 
-Fill in the configuration details in the YAML configuration file and put it under `~/.config/leafnet/config.yaml` or specify the path to it while starting the application.
+Fill in the configuration details in the toml configuration file and put it under `~/.config/leafnet/config.toml` or specify the path to it while starting the application.
 
 Run it:
 

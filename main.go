@@ -25,7 +25,7 @@ var (
 	//go:embed templates/*.gohtml templates/layouts/*.gohtml
 	templatesFS embed.FS
 
-	defaultConfigPath string = ".config/leafnet/config.yaml"
+	defaultConfigPath string = ".config/leafnet/config.toml"
 	configFilePath    string
 
 	sessionKey string

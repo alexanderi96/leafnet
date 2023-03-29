@@ -1,6 +1,0 @@
-neo4j_endpoint: "neo4j-db-endpoint"
-neo4j_port: "neo4j-db-port"
-neo4j_schema: "neo4j-db-schema"
-neo4j_username: "neo4j-db-username"
-neo4j_password: ".neo4j-db-password"
-leafnet_port: "leafnet-port"

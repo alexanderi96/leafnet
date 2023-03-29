@@ -50,7 +50,7 @@
         var eventDate = new Date(today.getFullYear(), eventFullDate.getMonth(), eventFullDate.getDate());
         var tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
         var diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
-  
+
         var dateString = eventDate.toLocaleDateString();
         if (eventDate.toDateString() == today.toDateString()) {
           dateString = "today";
@@ -59,14 +59,14 @@
         } else {
           dateString = -diffDays + " days ago";
         }
-  
+
         return {
           event: yearsPassed + " " + event,
           date: dateString,
           url: url
         };
       }
-  
+
       function updateTable(table, events) {
         var rows = "";
         events.forEach(function (event) {
@@ -74,7 +74,7 @@
         });
         table.innerHTML = rows;
       }
-  
+
       function orderByField(list, field, ascending = true, secondField = "") {
         const order = ascending ? 1 : -1;
         const regex = /\d+/;
@@ -85,15 +85,15 @@
           return parseInt(a[field].match(regex)[0], 10) > parseInt(b[field].match(regex)[0], 10) ? order : -order;
         });
       }
-  
+
       var eventsTable = document.getElementById("eventsTable");
       var pastEvents = [];
       var currentEvents = [];
       var futureEvents = [];
-  
+
       {{ range $index, $person := .Persons }}
       {{ if $person.BirthDate}}
-      var formattedDate = formatDate("byrthday of", {{$person.BirthDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
+      var formattedDate = formatDate("byrthday of", {{ $person.BirthDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
       if (formattedDate.date == "today") {
         currentEvents.push(formattedDate);
       } else if (formattedDate.date.endsWith("come")) {
@@ -103,7 +103,7 @@
       }
       {{ end }}
       {{ if $person.DeathDate}}
-      var formattedDate = formatDate("death anniversary of", {{$person.DeathDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
+      var formattedDate = formatDate("death anniversary of", {{ $person.DeathDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
       if (formattedDate.date == "today") {
         currentEvents.push(formattedDate);
       } else if (formattedDate.date.endsWith("come")) {
@@ -113,7 +113,7 @@
       }
       {{ end }}
       {{ end }}
-  
+
       updateTable(document.getElementById("eventsPassedTable"), orderByField(pastEvents, "date", false, "event"));
       updateTable(document.getElementById("eventsTodayTable"), orderByField(currentEvents, "date", true, "event"));
       updateTable(document.getElementById("eventsFutureTable"), orderByField(futureEvents, "date", true, "event"));

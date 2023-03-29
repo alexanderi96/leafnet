@@ -4,14 +4,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-yaml/yaml"
+	"github.com/pelletier/go-toml/v2"
 )
 
 var (
 	Config map[string]string
 )
 
-// the readConfig function, it reads the yaml file and puts the variables in the config map
+// the readConfig function, it reads the toml file and puts the variables in the config map
 func ReadConfig(path string) error {
 	log.Println("Reading config file: ", path)
 	Config = make(map[string]string)
@@ -21,8 +21,8 @@ func ReadConfig(path string) error {
 	}
 	defer file.Close()
 
-	// read the yaml file
-	decoder := yaml.NewDecoder(file)
+	// read the toml file
+	decoder := toml.NewDecoder(file)
 	err = decoder.Decode(&Config)
 	if err != nil {
 		return err

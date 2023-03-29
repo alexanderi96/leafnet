@@ -17,9 +17,10 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 		//TODO: implement user update
 		http.Redirect(w, r, "/my-profile", http.StatusFound)
 	} else if r.Method == "GET" {
-		log.Println("Viewing: ", c.User)
+		log.Println("Viewing: ", c.User.Email)
 		if err := templates["userprofile"].Execute(w, c); err != nil {
 			WriteError(w, err)
+			return
 		}
 	}
 
@@ -35,6 +36,7 @@ func DeleteMyAccount(w http.ResponseWriter, r *http.Request) {
 	log.Println("Attempting to delete user: ", c.User)
 	if err := db.DeleteSelectedUser(c.User.Email, c.User.Password); err != nil {
 		WriteError(w, err)
+		return
 	}
 
 	log.Println("Account deleted, redirecting...")

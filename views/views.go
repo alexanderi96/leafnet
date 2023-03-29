@@ -58,9 +58,11 @@ func prepareContext(w http.ResponseWriter, r *http.Request) {
 	if user := sessions.GetCurrentUser(r); user != "" {
 		if c.User, err = db.GetUserInfoByEmail(user); err != nil {
 			WriteError(w, err)
+			return
 
 		} else if c.Persons, err = db.GetPersons(); err != nil {
 			WriteError(w, err)
+			return
 
 		}
 	} else {

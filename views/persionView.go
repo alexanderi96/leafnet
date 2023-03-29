@@ -60,6 +60,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		// Save the person to the database
 		if err := db.ManagePerson(&p); err != nil {
 			WriteError(w, err)
+			return
 		}
 
 		http.Redirect(w, r, "/view", http.StatusFound)
@@ -78,6 +79,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 
 		if err := templates["manageperson"].Execute(w, c); err != nil {
 			WriteError(w, err)
+			return
 		}
 	}
 }
@@ -88,6 +90,7 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 
 		if err := db.DeletePerson(uuid); err != nil {
 			WriteError(w, err)
+			return
 		}
 		log.Println("Deleted person: ", uuid)
 
@@ -100,5 +103,30 @@ func ViewPeople(w http.ResponseWriter, r *http.Request) {
 
 	if err := templates["people"].Execute(w, c); err != nil {
 		WriteError(w, err)
+		return
+	}
+}
+
+func GraphFunc(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		prepareContext(w, r)
+		uuid := r.URL.Query().Get("uuid")
+		msg := "Attempting to access graph page"
+
+		var err error
+		if uuid != "" {
+			msg += " with uuid: " + uuid
+			if c.Persons, err = db.FetchAncestors(uuid); err != nil {
+				WriteError(w, err)
+			}
+		} else if c.Persons, err = db.GetPersons(); err != nil {
+			WriteError(w, err)
+		}
+
+		log.Println(msg)
+		if err := templates["graph"].Execute(w, c); err != nil {
+			WriteError(w, err)
+			return
+		}
 	}
 }

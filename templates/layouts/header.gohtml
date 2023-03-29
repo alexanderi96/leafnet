@@ -1,6 +1,6 @@
 {{define "header"}}
 <header>
-  <nav class="navbar navbar-expand-sm sticky-top navbar-light bg-light shadow">
+  <nav id="leafnet-navbar" class="navbar navbar-expand-sm sticky-top navbar-light bg-light shadow">
     <!-- Container wrapper -->
     <div class="container-fluid">
       <a class="navbar-brand">Leafnet</a>
@@ -60,7 +60,7 @@
         <div class="modal-body">
           <form action="/login" method="POST">
             <div class="form-outline mb-4">
-              <label class="form-label" for="email">Email address</label>
+              <label class="form-label" for="email">Email</label>
               <input type="email" name="email" class="form-control" id="email">
             </div>
             <div class="form-outline mb-4">
@@ -90,11 +90,11 @@
         <div class="modal-body">
           <form action="/signup" method="POST">
             <div class="form-outline mb-4">
-              <label class="form-label" for="user_name">UserName</label>
+              <label class="form-label" for="user_name">Username</label>
               <input type="text" name="user_name" class="form-control" id="user_name">
             </div>
             <div class="form-outline mb-4">
-              <label class="form-label" for="email">Email address</label>
+              <label class="form-label" for="email">Email</label>
               <input type="email" name="email" class="form-control" id="email">
             </div>
             <div class="form-outline mb-4">

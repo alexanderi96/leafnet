@@ -112,10 +112,9 @@ func ManagePerson(p *types.Person) error {
 
 	// Esecuzione della query
 
-	if res, err := session.Run(query, params); err != nil {
+	if _, err := session.Run(query, params); err != nil {
 		return err
 	} else {
-		log.Println(res)
 		return nil
 	}
 }
@@ -130,7 +129,6 @@ func GetPerson(uuid string) (types.Person, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return types.Person{}, err
 	} else if res.Next() {
-		log.Println(res)
 		return checkRecordAndGetPerson(res.Record()), nil
 	} else {
 		return types.Person{}, fmt.Errorf("person not found")
@@ -145,7 +143,6 @@ func GetPersons() ([]types.Person, error) {
 	if res, err := session.Run(query, nil); err != nil {
 		return nil, err
 	} else {
-		log.Println(res)
 		persons := []types.Person{}
 		for res.Next() {
 
@@ -160,11 +157,26 @@ func DeletePerson(uuid string) error {
 	defer session.Close()
 	query := fmt.Sprintf(`MATCH (p:Person{uuid: '%s'}) DETACH DELETE p`, uuid)
 
-	if res, err := session.Run(query, nil); err != nil {
+	if _, err := session.Run(query, nil); err != nil {
 		return err
 	} else {
-		log.Println(res)
 		return nil
+	}
+}
+
+func FetchAncestors(uuid string) ([]types.Person, error) {
+	session := newSession()
+	defer session.Close()
+	query := fmt.Sprintf(`MATCH path = (:Person {uuid: '%s'})<-[:PARENT_OF*1..]-(ancestor:Person) WITH path, ancestor UNWIND nodes(path) as p RETURN DISTINCT p.uuid as uuid, p.creation_date as creation_date, p.last_update as last_update, p.owner as owner, p.first_name as first_name, p.last_name as last_name, p.birth_date as birth_date, p.death_date as death_date, p.parent1 as parent1, p.parent2 as parent2, p.bio as bio`, uuid)
+
+	if res, err := session.Run(query, nil); err != nil {
+		return nil, err
+	} else {
+		persons := []types.Person{}
+		for res.Next() {
+			persons = append(persons, checkRecordAndGetPerson(res.Record()))
+		}
+		return persons, nil
 	}
 }
 

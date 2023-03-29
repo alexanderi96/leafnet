@@ -18,21 +18,24 @@
 						<div class="col-md">
 							<label class="form-label" for="first_name">First Name</label>
 							<input type="text" id="first_name" name="first_name" value="{{.Person.FirstName}}"
-								class="form-control" placeholder="First Name" required {{if .Page.IsDisabled}}disabled{{end}}>
+								class="form-control" placeholder="First Name" required {{if
+								.Page.IsDisabled}}disabled{{end}}>
 						</div>
 						<div class="col-md">
 							<label class="form-label" for="last_name">Last Name</label>
 							<input type="text" id="last_name" name="last_name" value="{{.Person.LastName}}"
-								class="form-control" placeholder="Last Name" required {{if .Page.IsDisabled}}disabled{{end}}>
+								class="form-control" placeholder="Last Name" required {{if
+								.Page.IsDisabled}}disabled{{end}}>
 						</div>
 					</div>
 					<br>
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="birth_date">Birth Date</label>
-							<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder="" {{if .Page.IsDisabled}}disabled{{end}}>
+							<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder=""
+								{{if .Page.IsDisabled}}disabled{{end}}>
 							<script type="text/javascript">
-								setValue("birth_date", timestampToDate({{.Person.BirthDate }}))
+								setValue("birth_date", timestampSecondsToDate({{.Person.BirthDate }}))
 							</script>
 						</div>
 						<div class="col-md">
@@ -40,12 +43,13 @@
 							<div class="input-group">
 								<div class="input-group-text">
 									<input class="form-check-input" value="" aria-label="Checkbox for following input"
-										type="checkbox" id="enableDeathDate" {{if .Person.DeathDate}}checked{{end}} {{if .Page.IsDisabled}}disabled{{end}}>
+										type="checkbox" id="enableDeathDate" {{if .Person.DeathDate}}checked{{end}} {{if
+										.Page.IsDisabled}}disabled{{end}}>
 								</div>
-								<input type="date" id="death_date" name="death_date" class="form-control"
-									placeholder="" {{if .Page.IsDisabled}}disabled{{end}}>
+								<input type="date" id="death_date" name="death_date" class="form-control" placeholder=""
+									{{if .Page.IsDisabled}}disabled{{end}}>
 								<script type="text/javascript">
-									setValue("death_date", timestampToDate({{.Person.DeathDate }}))
+									setValue("death_date", timestampSecondsToDate({{.Person.DeathDate }}))
 								</script>
 							</div>
 						</div>
@@ -55,7 +59,8 @@
 					<div class="row g-2">
 						<div class="col-md">
 							<label class="form-label" for="parent1">Parent 1</label>
-							<select class="form-select" name="parent1" data-placeholder="Parent 1 select" id="parent1" {{if .Page.IsDisabled}}disabled{{end}}>
+							<select class="form-select" name="parent1" data-placeholder="Parent 1 select" id="parent1"
+								{{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
@@ -63,7 +68,8 @@
 						</div>
 						<div class="col-md">
 							<label class="form-label" for="parent2">Parent 2</label>
-							<select class="form-select" name="parent2" data-placeholder="Parent 2 select" id="parent2" {{if .Page.IsDisabled}}disabled{{end}}>
+							<select class="form-select" name="parent2" data-placeholder="Parent 2 select" id="parent2"
+								{{if .Page.IsDisabled}}disabled{{end}}>
 								{{range $key, $value := .Persons}}
 								<option value="{{$value.Node.UUID}}">{{$value.FirstName}} {{$value.LastName}}</option>
 								{{end}}
@@ -88,7 +94,8 @@
 					<div>
 						{{if or .Page.IsOwner (not .Page.IsDisabled)}}
 						<input type="submit" value="Save" class="btn btn-primary" />
-						<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+						<button type="button" class="btn btn-danger" data-bs-toggle="modal"
+							data-bs-target="#deleteModal">Delete</button>
 						{{end}}
 						<button class="btn btn-secondary" onclick="window.history.back()">Back</button>
 					</div>
@@ -98,20 +105,28 @@
 							Person created by: {{.Person.Node.Owner}}
 							<span id="creation_date_info_span" />
 							<script type="text/javascript">
-							setInnerText("creation_date_info_span", "on " + timestampToDate({{.Person.Node.CreationDate}}) + ". ")
+								setInnerText("creation_date_info_span", "on " + timestampMilliSecondsToDate({{.Person.Node.CreationDate }}) + ". ")
 							</script>
 							</span>
 							<span id="last_update_info_span" />
 							<script type="text/javascript">
-							setInnerText("last_update_info_span", "Last update on " + timestampToDate({{.Person.Node.CreationDate}}) + ".")
+								setInnerText("last_update_info_span", "Last update on " + timestampMilliSecondsToDate({{.Person.Node.CreationDate }}) + ".")
 							</script>
 							</span>
 						</p>
 					</div>
 					{{end}}
-				  </div>
+				</div>
 			</div>
 			</form>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="card col-lg shadow">
+			<div class="card-body">
+				<a class="btn btn-primary btn-lg" href="/graph?uuid={{.Person.Node.UUID}}" role="button">Show graph</a>
+			</div>
 		</div>
 	</div>
 </div>
