@@ -35,7 +35,7 @@
 							<input type="date" id="birth_date" name="birth_date" class="form-control" placeholder=""
 								{{if .Page.IsDisabled}}disabled{{end}}>
 							<script type="text/javascript">
-								setValue("birth_date", timestampToDate({{.Person.BirthDate }}))
+								setValue("birth_date", timestampSecondsToDate({{.Person.BirthDate }}))
 							</script>
 						</div>
 						<div class="col-md">
@@ -49,7 +49,7 @@
 								<input type="date" id="death_date" name="death_date" class="form-control" placeholder=""
 									{{if .Page.IsDisabled}}disabled{{end}}>
 								<script type="text/javascript">
-									setValue("death_date", timestampToDate({{.Person.DeathDate }}))
+									setValue("death_date", timestampSecondsToDate({{.Person.DeathDate }}))
 								</script>
 							</div>
 						</div>
