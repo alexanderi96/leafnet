@@ -17,7 +17,7 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 		//TODO: implement user update
 		http.Redirect(w, r, "/my-profile", http.StatusFound)
 	} else if r.Method == "GET" {
-		log.Println("Viewing: ", c.User)
+		log.Println("Viewing: ", c.User.Email)
 		if err := templates["userprofile"].Execute(w, c); err != nil {
 			WriteError(w, err)
 			return

@@ -105,12 +105,12 @@
 							Person created by: {{.Person.Node.Owner}}
 							<span id="creation_date_info_span" />
 							<script type="text/javascript">
-								setInnerText("creation_date_info_span", "on " + timestampToDate({{.Person.Node.CreationDate }}) + ". ")
+								setInnerText("creation_date_info_span", "on " + timestampMilliSecondsToDate({{.Person.Node.CreationDate }}) + ". ")
 							</script>
 							</span>
 							<span id="last_update_info_span" />
 							<script type="text/javascript">
-								setInnerText("last_update_info_span", "Last update on " + timestampToDate({{.Person.Node.CreationDate }}) + ".")
+								setInnerText("last_update_info_span", "Last update on " + timestampMilliSecondsToDate({{.Person.Node.CreationDate }}) + ".")
 							</script>
 							</span>
 						</p>

@@ -139,31 +139,3 @@ func HomeFunc(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
-func GraphFunc(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		prepareContext(w, r)
-		uuid := r.URL.Query().Get("uuid")
-
-		//TODO: fix this
-		if uuid != "" {
-			log.Println("Attempting to access graph page with uuid: ", uuid)
-			if ppl, err := db.FetchAncestors(uuid); err == nil {
-				log.Println("Fetched ", len(ppl), " persons")
-				c.Persons = ppl
-			} else {
-				WriteError(w, err)
-			}
-		} else if ppl, err := db.GetPersons(); err == nil {
-			c.Persons = ppl
-		} else {
-			WriteError(w, err)
-		}
-
-		log.Println("Attempting to access graph page")
-		if err := templates["graph"].Execute(w, c); err != nil {
-			WriteError(w, err)
-			return
-		}
-	}
-}

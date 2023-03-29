@@ -1,12 +1,22 @@
 {{define "scripts"}}
 <script type="text/javascript">
-  function timestampToDate(tstamp) {
+  function timestampSecondsToDate(tstamp) {
     if (!tstamp) {
       return "";
     }
     // rendo la data appetibile per il campo
     let timestamp = tstamp * 1000;
     let date = new Date(timestamp);
+    let formattedDate = date.toISOString().substr(0, 10);
+    return formattedDate;
+  }
+
+  function timestampMilliSecondsToDate(tstamp) {
+    if (!tstamp) {
+      return "";
+    }
+    // rendo la data appetibile per il campo
+    let date = new Date(tstamp);
     let formattedDate = date.toISOString().substr(0, 10);
     return formattedDate;
   }
