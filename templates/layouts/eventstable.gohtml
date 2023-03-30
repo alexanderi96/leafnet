@@ -93,7 +93,7 @@
 
       {{ range $index, $person := .Persons }}
       {{ if $person.BirthDate}}
-      var formattedDate = formatDate("byrthday of", {{ $person.BirthDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
+      var formattedDate = formatDate("birthday of", {{ $person.BirthDate }}, '<a href="/manage-person?uuid={{$person.Node.UUID}}">{{$person.FirstName}} {{$person.LastName}}</a>');
       if (formattedDate.date == "today") {
         currentEvents.push(formattedDate);
       } else if (formattedDate.date.endsWith("come")) {
