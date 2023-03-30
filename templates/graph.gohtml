@@ -32,6 +32,9 @@
         <br>
         <label for="node-charge" class="form-label">Node Charge Force</label>
         <input type="range" class="form-range" id="node-charge" min="-15" max="15">
+        <br>
+        <label class="form-label">Show Node Labels</label>
+        <input type="checkbox" class="form-check-input" id="show-node-labels" checked>
     </div>
   </div>
 </div>
@@ -41,14 +44,14 @@
 <script type="module">
   import { CSS2DRenderer, CSS2DObject } from '//unpkg.com/three/examples/jsm/renderers/CSS2DRenderer.js';
   
-  // change the graph orientation based on the settings
+  // Change the graph orientation based on the settings
   const orientationSelect = document.getElementById('orientation-select');
   orientationSelect.addEventListener('change', (e) => {
     const orientation = e.target.value;
     graph && graph.dagMode(orientation);
   });
 
-  // Event listener per Link Strength slider
+  // Event listener for Link Strength slider
   const linkStrengthSlider = document.getElementById('link-strength');
   linkStrengthSlider.addEventListener('input', (e) => {
     const strength = e.target.value;
@@ -56,7 +59,7 @@
     graph.numDimensions(3);
   });
 
-  // Event listener per Link Distance slider
+  // Event listener for Link Distance slider
   const linkDistanceSlider = document.getElementById('link-distance');
   linkDistanceSlider.addEventListener('input', (e) => {
     const distance = e.target.value;
@@ -64,7 +67,7 @@
     graph.numDimensions(3);
   });
 
-  // Event listener per Link Distance slider
+  // Event listener for Node Charge slider
   const nodeChargeSlider = document.getElementById('node-charge');
   nodeChargeSlider.addEventListener('input', (e) => {
     const distance = e.target.value;
@@ -81,18 +84,36 @@
       graph.nodeVisibility(() => true);
     } else {
       graph.nodeVisibility(node => {
-        const nodeName = node.name.toLowerCase();
-        return nodeName.includes(searchTerm);
+        const nodeLabel = node.label.toLowerCase();
+        return nodeLabel.includes(searchTerm);
       });
     }
 
     graph.refresh();
   });
-  
 
+  const showNodeLabelsCheckbox = document.getElementById('show-node-labels');
+  showNodeLabelsCheckbox.addEventListener('change', (e) => {
+    showNodeLabels = e.target.checked;
+    graph.nodeLabel(node => getLabel(node));
+    refreshNodeLabels();
+  });
+
+  function refreshNodeLabels() {
+    graph.nodeThreeObject(graph.nodeThreeObject()); // Aggiorna la funzione nodeThreeObject
+  }
+
+  function getLabel(node) {
+  if (!showNodeLabels) {
+    return node.label;
+  } else {
+    return null;
+  }
+}
+  
   // graph config
+  let showNodeLabels = true;
   const NODE_REL_SIZE = 5;
-  //const Y_POSITION_CONSTANT = 1;
   const graph = ForceGraph3D({
     extraRenderers: [new CSS2DRenderer()],
     // controlType: 'fly'
@@ -102,45 +123,29 @@
     .backgroundColor('#101020')
     .linkColor(() => 'rgba(255,255,255,0.5)')
     .nodeRelSize(NODE_REL_SIZE)
-    // .nodeId('id')
-    // .nodeVal('value')
-    .nodeLabel('first_name' + " " + 'last_name')
-    // .nodeAutoColorBy('last_name')
+    .nodeId('id')
     .nodeOpacity(0.9)
     .linkDirectionalParticles(2)
     .linkDirectionalParticleColor(() => 'rgba(255,255,255,1)')
     .linkDirectionalParticleWidth(2)
     .linkDirectionalParticleSpeed(0.002)
-    //.d3Force('collision', d3.forceCollide(node => Math.cbrt(node.size) * NODE_REL_SIZE - 2))
-    // .d3VelocityDecay(0.1)
     .linkWidth(2);
-
-  // Decrease repel intensity
-  // graph.d3Force('charge').strength(-15);
-
-  // graph.d3Force('link')
-  //   .distance(link => 0.9)
-  //   .strength(link => 0.5);
 
   function getData(persons) {
     const nodes = [];
     const links = [];
-
-    // Crea un oggetto per ogni persona e lo aggiunge all'array nodes
+    
     persons.forEach((person) => {
       const node = {
         id: person.uuid,
-        first_name: person.first_name,
+        label: person.first_name + " " + person.last_name,
         last_name: person.last_name,
         parent1: person.parent1, // parent1 uuid
-        parent2: person.parent2 // parent2 uuid
+        parent2: person.parent2, // parent2 uuid
       };
 
       nodes.push(node);
-    });
-
-    // Aggiunge i collegamenti ai genitori all'array links
-    persons.forEach((person) => {
+      
       if (person.parent1) {
         links.push({
           source: person.parent1,
@@ -162,11 +167,15 @@
   }
 
   graph(document.getElementById('graph'))
-    .graphData(getData({{.Persons }}))
+    .graphData(getData({{.Persons}}))
     .nodeAutoColorBy('last_name')
     .nodeThreeObject(node => {
+      if (!showNodeLabels) {
+        return null;
+      }
+
       const nodeEl = document.createElement('div');
-      nodeEl.textContent = node.first_name + ' ' + node.last_name;
+      nodeEl.textContent = node.label;
       nodeEl.style.color = node.color;
       nodeEl.className = 'node-label';
       return new CSS2DObject(nodeEl);
