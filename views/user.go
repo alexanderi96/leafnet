@@ -18,7 +18,7 @@ func UserPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/my-profile", http.StatusFound)
 	} else if r.Method == "GET" {
 		log.Println("Viewing: ", c.User.Email)
-		if err := templates["userprofile"].Execute(w, c); err != nil {
+		if err := templates["user_profile"].Execute(w, c); err != nil {
 			WriteError(w, err)
 			return
 		}

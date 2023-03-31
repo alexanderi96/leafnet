@@ -77,7 +77,7 @@ func AddPerson(w http.ResponseWriter, r *http.Request) {
 		c.Page.IsOwner = c.Person.Node.Owner == "" || c.Person.Node.Owner == c.User.UserName
 		c.Page.IsDisabled = !c.Page.IsOwner
 
-		if err := templates["manageperson"].Execute(w, c); err != nil {
+		if err := templates["manage_person"].Execute(w, c); err != nil {
 			WriteError(w, err)
 			return
 		}
