@@ -148,14 +148,14 @@
       
       if (person.parent1) {
         links.push({
-          source: person.parent1,
-          target: person.uuid
+          source: person.uuid,
+          target: person.parent1
         });
       }
       if (person.parent2) {
         links.push({
-          source: person.parent2,
-          target: person.uuid
+          source: person.uuid,
+          target: person.parent2
         });
       }
     });
