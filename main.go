@@ -84,6 +84,9 @@ func main() {
 	http.HandleFunc("/view", views.RequiresLogin(views.ViewPeople))
 	http.HandleFunc("/delete", views.RequiresLogin(views.DeletePerson))
 
+	// API
+	http.HandleFunc("/api/get-people", views.RequiresLogin(views.GetPeople))
+
 	log.Println("Leafnet is running on port " + config.Config["leafnet_port"])
 	http.ListenAndServe(":"+config.Config["leafnet_port"], nil)
 }

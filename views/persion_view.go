@@ -1,6 +1,7 @@
 package views
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -105,6 +106,17 @@ func ViewPeople(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, err)
 		return
 	}
+}
+
+func GetPeople(w http.ResponseWriter, r *http.Request) {
+
+	prepareContext(w, r)
+
+	// Imposta l'header Content-Type come application/json
+	w.Header().Set("Content-Type", "application/json")
+
+	// Serializza la slice di persone in JSON e invia la risposta
+	json.NewEncoder(w).Encode(c.Persons)
 }
 
 func GraphFunc(w http.ResponseWriter, r *http.Request) {
