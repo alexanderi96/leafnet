@@ -42,7 +42,7 @@ Handlers behind `views.RequiresLogin` are the whole authorization model.
 
 | Component | Tech |
 |---|---|
-| Language | Go 1.19 |
+| Language | Go 1.25 |
 | HTTP | stdlib `net/http` |
 | Templates | stdlib `html/template` + `go:embed` |
 | Database | Neo4j (`neo4j-go-driver` v1.8) |
